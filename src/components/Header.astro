@@ -1,0 +1,167 @@
+---
+import Logo from './Logo.astro';
+import { site } from '../data/site';
+const path = Astro.url.pathname;
+---
+
+<header class="hdr">
+  <div class="hdr__row">
+    <a href="/" class="hdr__brand" aria-label={`${site.name} — inicio`}>
+      <Logo class="hdr__logo" />
+      <span class="hdr__counter tabular" id="hdr-time">MTY · —</span>
+    </a>
+
+    <nav class="hdr__nav" aria-label="Navegación principal">
+      <a href="/trabajo" class:list={['hdr__link', { 'is-on': path.startsWith('/trabajo') }]}>Trabajo</a>
+      <a href="/#nosotros" class="hdr__link">Nosotros</a>
+      <a href="/colofon" class:list={['hdr__link', { 'is-on': path === '/colofon' }]}>Colofón</a>
+    </nav>
+
+    <a href="/contacto" class="hdr__cta">
+      <span>Escribir</span>
+      <span class="hdr__cta-arrow" aria-hidden="true">→</span>
+    </a>
+
+    <button class="hdr__menu" type="button" aria-label="Menú" aria-expanded="false" id="menu-toggle">
+      <span>Menú</span>
+    </button>
+  </div>
+
+  <div class="hdr__sheet" id="menu-sheet" hidden>
+    <ul>
+      <li><a href="/" class="light">Casa</a></li>
+      <li><a href="/trabajo" class="light">Trabajo</a></li>
+      <li><a href="/#nosotros" class="light">Nosotros</a></li>
+      <li><a href="/#equipo" class="light">Equipo</a></li>
+      <li><a href="/#premios" class="light">Premios</a></li>
+      <li><a href="/colofon" class="light">Colofón</a></li>
+      <li><a href="/contacto" class="light">Contacto</a></li>
+    </ul>
+    <a href={`mailto:${site.email}`} class="hdr__sheet-mail u">{site.email}</a>
+  </div>
+</header>
+
+<style>
+  .hdr {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .hdr__row {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: var(--sp-4);
+    padding: var(--sp-3) var(--gutter);
+  }
+  .hdr__brand { display: inline-flex; align-items: baseline; gap: var(--sp-3); }
+  :global(.hdr__logo) { display: block; height: 18px; width: auto; color: var(--fg); }
+  @media (min-width: 768px) { :global(.hdr__logo) { height: 22px; } }
+  .hdr__counter {
+    font-size: var(--fs-xs);
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+  }
+  @media (max-width: 640px) { .hdr__counter { display: none; } }
+
+  .hdr__nav {
+    display: none;
+    gap: var(--sp-5);
+    justify-self: end;
+    margin-right: var(--sp-4);
+  }
+  .hdr__link {
+    font-size: var(--fs-sm);
+    color: var(--fg);
+    position: relative;
+    padding: 4px 0;
+    transition: opacity var(--dur) var(--ease);
+  }
+  .hdr__link:hover { opacity: 0.6; }
+  .hdr__link.is-on::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 1px; background: currentColor;
+  }
+
+  .hdr__cta {
+    display: none;
+    align-items: baseline;
+    gap: 4px;
+    font-size: var(--fs-md);
+    transition: color var(--dur);
+  }
+  .hdr__cta:hover { color: var(--accent); }
+  .hdr__cta .serif { font-size: var(--fs-lg); }
+  .hdr__cta-arrow { transition: transform var(--dur) var(--ease); }
+  .hdr__cta:hover .hdr__cta-arrow { transform: translateX(3px); }
+
+  .hdr__menu {
+    font-size: var(--fs-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    padding: var(--sp-2) 0;
+  }
+
+  @media (min-width: 768px) {
+    .hdr__nav { display: inline-flex; }
+    .hdr__cta { display: inline-flex; }
+    .hdr__menu { display: none; }
+  }
+
+  .hdr__sheet {
+    background: var(--bg);
+    border-top: 1px solid var(--hairline);
+    padding: var(--sp-4) var(--gutter) var(--sp-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+  }
+  .hdr__sheet[hidden] { display: none; }
+  .hdr__sheet ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--sp-2); }
+  .hdr__sheet ul a { font-size: var(--fs-2xl); letter-spacing: -0.03em; }
+  .hdr__sheet-mail { font-size: var(--fs-md); color: var(--muted); margin-top: var(--sp-3); align-self: flex-start; }
+  @media (min-width: 768px) { .hdr__sheet { display: none !important; } }
+</style>
+
+<script>
+  // Reloj MTY (UTC-6) para el counter del header.
+  const updateTime = () => {
+    const el = document.getElementById('hdr-time');
+    if (!el) return;
+    const t = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Monterrey',
+      hour: '2-digit', minute: '2-digit', hour12: false,
+    }).format(new Date());
+    el.textContent = `MTY · ${t}`;
+  };
+  document.addEventListener('astro:page-load', () => {
+    updateTime();
+    setInterval(updateTime, 30_000);
+  });
+  updateTime();
+  setInterval(updateTime, 30_000);
+
+  // Menu mobile sheet.
+  const initMenu = () => {
+    const btn = document.getElementById('menu-toggle');
+    const sheet = document.getElementById('menu-sheet');
+    if (!btn || !sheet) return;
+    btn.addEventListener('click', () => {
+      const open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!open));
+      if (open) sheet.setAttribute('hidden', '');
+      else sheet.removeAttribute('hidden');
+    });
+    sheet.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      btn.setAttribute('aria-expanded', 'false');
+      sheet.setAttribute('hidden', '');
+    }));
+  };
+  document.addEventListener('astro:page-load', initMenu);
+  initMenu();
+</script>

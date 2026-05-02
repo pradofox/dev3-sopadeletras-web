@@ -1,0 +1,40 @@
+---
+// Lenis (lib MIT open source). Smooth scroll discreto + reveal observer.
+---
+<script>
+  import Lenis from 'lenis';
+
+  let lenis: Lenis | null = null;
+  let io: IntersectionObserver | null = null;
+
+  const start = () => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (lenis) lenis.destroy();
+    lenis = new Lenis({
+      duration: 1.0,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 1,
+    });
+    const raf = (time: number) => {
+      lenis?.raf(time);
+      requestAnimationFrame(raf);
+    };
+    requestAnimationFrame(raf);
+
+    if (io) io.disconnect();
+    io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-in');
+          io!.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('[data-reveal]').forEach((el) => io!.observe(el));
+  };
+
+  document.addEventListener('astro:page-load', start);
+  start();
+</script>

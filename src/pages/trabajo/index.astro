@@ -1,0 +1,54 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProjectListEditorial from '../../components/ProjectListEditorial.astro';
+import { getCollection } from 'astro:content';
+
+export const prerender = true;
+
+const portfolio = (await getCollection('portfolio'))
+  .filter(p => !p.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const items = portfolio.map(p => ({
+  href: `/trabajo/${p.id}`,
+  title: p.data.title,
+  client: p.data.client,
+  categories: p.data.categories,
+  cover: p.data.cover,
+  year: p.data.year,
+}));
+---
+
+<Base
+  title="Trabajo"
+  description="Portafolio de sopadeletras®. Proyectos de estrategia creativa, branding, diseño y producción audiovisual para marcas e instituciones."
+>
+  <section class="head wrap">
+    <p class="eye">Portafolio · <span class="tabular">{items.length}</span> proyectos · 2017→2026</p>
+    <h1 class="head__title">
+      <span class="light">Todo el</span>
+      <span class="bold">trabajo</span>
+    </h1>
+    <p class="head__lede">
+      Una selección de los proyectos que sí publicamos. Si no ves algo
+      que viste por ahí, probablemente está bajo NDA o lo estamos puliendo
+      para subirlo aquí.
+    </p>
+  </section>
+
+  <ProjectListEditorial items={items} showYear={true} />
+</Base>
+
+<style>
+  .head { padding-block: clamp(5rem, 12vw, 9rem) clamp(2rem, 5vw, 4rem); }
+  .head__title {
+    font-size: var(--fs-display);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    font-weight: 300;
+    margin-block: var(--sp-4) var(--sp-5);
+  }
+  .head__title span { display: block; }
+  .head__title .bold { font-weight: 700; color: var(--accent); }
+  .head__lede { font-size: var(--fs-md); color: var(--muted); max-width: 56ch; line-height: 1.55; }
+</style>

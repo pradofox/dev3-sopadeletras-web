@@ -1,0 +1,184 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+---
+
+<Base title="Contacto" description={`Cuéntanos sobre la idea que tienes en mente. Escríbenos a ${site.email}.`}>
+  <section class="head wrap">
+    <p class="eye">Contacto · respondemos en menos de <span class="tabular">24h</span></p>
+    <h1 class="head__title">
+      <span class="light">Cuéntanos qué</span>
+      <span class="bold">tienes en mente.</span>
+    </h1>
+  </section>
+
+  <hr class="hr" />
+
+  <section class="big wrap">
+    <p class="eye">Escríbenos</p>
+    <a href={`mailto:${site.email}`} class="big__mail">
+      <span>{site.email}</span>
+      <span class="big__arrow" aria-hidden="true">→</span>
+    </a>
+    <p class="big__note">
+      O si prefieres más estructurada la conversación, llena el form acá abajo.
+      Lo que llene lo recibimos en el mismo correo.
+    </p>
+  </section>
+
+  <hr class="hr" />
+
+  <section class="form-wrap wrap">
+    <form method="POST" class="form" action="/contacto">
+      <input type="text" name="hp" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true" />
+
+      <div class="form__row">
+        <div class="field">
+          <label for="name" class="eye">Nombre</label>
+          <input type="text" id="name" name="name" required autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="email" class="eye">Correo</label>
+          <input type="email" id="email" name="email" required autocomplete="email" />
+        </div>
+      </div>
+
+      <div class="form__row">
+        <div class="field">
+          <label for="project" class="eye">Proyecto (opcional)</label>
+          <input type="text" id="project" name="project" placeholder="¿cómo lo llamarías?" />
+        </div>
+        <div class="field">
+          <label for="industry" class="eye">Industria</label>
+          <input type="text" id="industry" name="industry" />
+        </div>
+      </div>
+
+      <fieldset class="checks">
+        <legend class="eye">Servicios</legend>
+        <div class="checks__grid">
+          {['Estrategia creativa', 'Branding', 'Diseño', 'Producción audiovisual', 'Sitio web', 'Otro'].map(s => (
+            <label class="check">
+              <input type="checkbox" name="services" value={s} />
+              <span>{s}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label for="details" class="eye">Detalles</label>
+        <textarea id="details" name="details" rows="6" placeholder="contexto, presupuesto aproximado, fechas, lo que quieras"></textarea>
+      </div>
+
+      <button type="submit" class="submit">
+        <span>Enviar</span>
+        <span class="submit__arrow" aria-hidden="true">→</span>
+      </button>
+    </form>
+
+    <aside class="aside">
+      <div class="aside__row">
+        <p class="eye">También aquí</p>
+        <ul>
+          <li><a class="u" href={site.social.instagram} target="_blank" rel="noopener">Instagram</a></li>
+          <li><a class="u" href={site.social.tiktok} target="_blank" rel="noopener">TikTok</a></li>
+          <li><a class="u" href={site.social.linkedin} target="_blank" rel="noopener">LinkedIn</a></li>
+        </ul>
+      </div>
+      <div class="aside__row">
+        <p class="eye">Desde</p>
+        <p>Monterrey, NL — México</p>
+      </div>
+    </aside>
+  </section>
+</Base>
+
+<style>
+  .head { padding-block: clamp(5rem, 12vw, 9rem) clamp(2rem, 5vw, 4rem); }
+  .head__title {
+    font-size: var(--fs-display);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    font-weight: 300;
+    margin-top: var(--sp-4);
+  }
+  .head__title span { display: block; }
+  .head__title .bold { font-weight: 700; color: var(--accent); }
+
+  .big { padding-block: clamp(3rem, 7vw, 5rem); display: flex; flex-direction: column; gap: var(--sp-4); }
+  .big__mail {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--sp-3);
+    font-size: clamp(2rem, 7vw, 5rem);
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    word-break: break-word;
+    transition: color var(--dur);
+  }
+  .big__mail:hover { color: var(--accent); }
+  .big__arrow {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    color: var(--muted);
+    transition: transform var(--dur) var(--ease);
+  }
+  .big__mail:hover .big__arrow { transform: translateX(8px); color: var(--accent); }
+  .big__note { color: var(--muted); max-width: 56ch; line-height: 1.55; margin-top: var(--sp-3); }
+
+  .form-wrap {
+    padding-block: clamp(3rem, 6vw, 5rem) clamp(4rem, 10vw, 8rem);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--sp-10);
+  }
+  @media (min-width: 900px) { .form-wrap { grid-template-columns: 2fr 1fr; gap: var(--sp-12); } }
+
+  .form { display: flex; flex-direction: column; gap: var(--sp-6); }
+  .hp { position: absolute; left: -9999px; opacity: 0; pointer-events: none; }
+
+  .form__row { display: grid; grid-template-columns: 1fr; gap: var(--sp-5); }
+  @media (min-width: 640px) { .form__row { grid-template-columns: 1fr 1fr; } }
+
+  .field { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .field .eye { margin-bottom: 4px; }
+  input[type="text"], input[type="email"], textarea {
+    border: 0;
+    border-bottom: 1px solid var(--hairline);
+    background: transparent;
+    color: var(--fg);
+    font: inherit;
+    padding: var(--sp-2) 0;
+    transition: border-color var(--dur);
+    border-radius: 0;
+  }
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+  input:focus, textarea:focus { outline: none; border-bottom-color: var(--fg); }
+  textarea { resize: vertical; min-height: 7rem; }
+
+  .checks { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--sp-3); }
+  .checks__grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2) var(--sp-4); }
+  @media (min-width: 640px) { .checks__grid { grid-template-columns: repeat(3, 1fr); } }
+  .check { display: inline-flex; align-items: center; gap: var(--sp-2); cursor: pointer; }
+  .check input { accent-color: var(--accent); }
+
+  .submit {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-3);
+    font-size: var(--fs-lg);
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 4px;
+    transition: color var(--dur);
+  }
+  .submit:hover { color: var(--accent); }
+  .submit__arrow { transition: transform var(--dur) var(--ease); }
+  .submit:hover .submit__arrow { transform: translateX(4px); }
+
+  .aside { display: flex; flex-direction: column; gap: var(--sp-6); }
+  .aside__row { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .aside__row .eye { margin-bottom: 4px; }
+  .aside ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+</style>

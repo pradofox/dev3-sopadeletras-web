@@ -1,0 +1,75 @@
+---
+// Status del estudio. "Currently working on:" + un proyecto rotando.
+// Los strings son data sopa, editables sin tocar JSX.
+const slots = [
+  'Tikva (educación alternativa)',
+  'Xignux (corporativo)',
+  'Lua (quesos artesanales Chihuahua)',
+  'Introvertido (café)',
+  'AleaModa (pasarela co-creada)',
+];
+---
+
+<div class="status" aria-live="polite">
+  <span class="status__label eye">Currently</span>
+  <span class="status__sep" aria-hidden="true">·</span>
+  <span class="status__rotor">
+    {slots.map((s, i) => (
+      <span class="status__item" data-i={i} style={i === 0 ? 'opacity:1' : 'opacity:0'}>{s}</span>
+    ))}
+  </span>
+</div>
+
+<style>
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-sm);
+    color: var(--muted);
+  }
+  .status__label::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--c-verde);
+    margin-right: 8px;
+    vertical-align: middle;
+    animation: blink 2.4s ease-in-out infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+  .status__sep { opacity: 0.5; }
+  .status__rotor {
+    position: relative;
+    display: inline-block;
+    min-height: 1.2em;
+    min-width: 18em;
+  }
+  .status__item {
+    position: absolute;
+    top: 0; left: 0;
+    transition: opacity 600ms var(--ease);
+    color: var(--fg);
+    white-space: nowrap;
+  }
+  @media (max-width: 640px) {
+    .status__rotor { min-width: 14em; }
+    .status__item { white-space: normal; }
+  }
+</style>
+
+<script>
+  const init = () => {
+    const items = document.querySelectorAll<HTMLElement>('.status__item');
+    if (items.length < 2) return;
+    let cur = 0;
+    setInterval(() => {
+      items[cur].style.opacity = '0';
+      cur = (cur + 1) % items.length;
+      items[cur].style.opacity = '1';
+    }, 4200);
+  };
+  document.addEventListener('astro:page-load', init);
+  init();
+</script>

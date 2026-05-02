@@ -1,0 +1,242 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import { site } from '../../data/site';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const items = (await getCollection('portfolio')).filter(p => !p.data.draft);
+  return items.map(p => ({ params: { slug: p.id }, props: { p, all: items } }));
+}
+
+const { p, all } = Astro.props as { p: any; all: any[] };
+const { Content } = await render(p);
+
+const sorted = all.sort((a, b) => a.data.order - b.data.order);
+const idx = sorted.findIndex(x => x.id === p.id);
+const next = sorted[(idx + 1) % sorted.length];
+
+const projectSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: p.data.title,
+  description: p.data.summary,
+  creator: { '@type': 'Organization', name: 'sopadeletras®', url: site.url },
+  about: p.data.client,
+  keywords: p.data.categories.join(', '),
+  image: p.data.cover,
+  url: new URL(`/trabajo/${p.id}`, site.url).toString(),
+};
+---
+
+<Base
+  title={p.data.title}
+  description={p.data.summary}
+  ogImage={p.data.cover}
+  schema={projectSchema}
+>
+  <article>
+    <!-- HEAD -->
+    <section class="phead wrap">
+      <a href="/trabajo" class="phead__back u">← Trabajo</a>
+
+      <h1 class="phead__title">{p.data.title}</h1>
+      <p class="phead__summary">{p.data.summary}</p>
+    </section>
+
+    <hr class="hr" />
+
+    <!-- META -->
+    <section class="meta wrap">
+      <div>
+        <p class="eye">Cliente</p>
+        <p>{p.data.client}</p>
+      </div>
+      <div>
+        <p class="eye">Categoría</p>
+        <ul class="meta__cats">
+          {p.data.categories.map((c: string) => <li>{c}</li>)}
+        </ul>
+      </div>
+      <div>
+        <p class="eye">Duración</p>
+        <p>{p.data.duration}</p>
+      </div>
+      {p.data.year && (
+        <div>
+          <p class="eye">Año</p>
+          <p class="tabular">{p.data.year}</p>
+        </div>
+      )}
+      {p.data.collaborators.length > 0 && (
+        <div class="meta__col-wide">
+          <p class="eye">Colaboradores</p>
+          <p>{p.data.collaborators.join(', ')}</p>
+        </div>
+      )}
+    </section>
+
+    <hr class="hr" />
+
+    <!-- COVER -->
+    <section class="cover wrap" data-reveal>
+      <img src={p.data.cover} alt={`Imagen principal de ${p.data.title}`} />
+    </section>
+
+    <!-- QUOTE -->
+    {p.data.quote && (
+      <section class="quote wrap" data-reveal>
+        <blockquote>"{p.data.quote}"</blockquote>
+      </section>
+    )}
+
+    <!-- BODY -->
+    <section class="body wrap">
+      <aside class="body__side">
+        <p class="eye">Nuestro acercamiento</p>
+      </aside>
+      <div class="body__prose prose" data-reveal>
+        <Content />
+      </div>
+    </section>
+
+    <!-- GALLERY stack — minimalista, una imagen por fila full-bleed -->
+    {p.data.gallery.length > 1 && (
+      <section class="gal">
+        {p.data.gallery.slice(1).map((g: any, i: number) => (
+          <figure class="gal__item wrap" data-reveal>
+            <img src={g.src} alt={g.alt ?? `Imagen ${i+2} de ${p.data.title}`} loading="lazy" />
+            {g.caption && <figcaption>{g.caption}</figcaption>}
+          </figure>
+        ))}
+      </section>
+    )}
+
+    <hr class="hr" />
+
+    <!-- NEXT -->
+    <a href={`/trabajo/${next.id}`} class="next">
+      <div class="wrap next__inner">
+        <p class="eye">Siguiente proyecto</p>
+        <span class="next__title">{next.data.title}</span>
+        <span class="next__client">{next.data.client}</span>
+        <span class="next__arrow" aria-hidden="true">→</span>
+      </div>
+    </a>
+  </article>
+</Base>
+
+<style>
+  .phead {
+    padding-block: clamp(5rem, 12vw, 9rem) clamp(2rem, 5vw, 4rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+  }
+  .phead__back { font-size: var(--fs-sm); color: var(--muted); align-self: flex-start; }
+  .phead__title {
+    font-size: var(--fs-display);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    font-weight: 300;
+    margin-block: var(--sp-3) var(--sp-2);
+  }
+  .phead__summary {
+    font-size: var(--fs-lg);
+    color: var(--muted);
+    max-width: 60ch;
+    line-height: 1.45;
+  }
+
+  .meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-5);
+    padding-block: var(--sp-6);
+    font-size: var(--fs-sm);
+  }
+  @media (min-width: 768px) { .meta { grid-template-columns: repeat(5, 1fr); } }
+  .meta .eye { margin-bottom: var(--sp-2); }
+  .meta__cats { list-style: none; padding: 0; margin: 0; }
+  .meta__col-wide { grid-column: 1 / -1; }
+  @media (min-width: 768px) { .meta__col-wide { grid-column: span 2; } }
+
+  .cover { padding-block: var(--sp-4); }
+  .cover img { width: 100%; aspect-ratio: 16/9; object-fit: cover; background: var(--subtle); }
+
+  .quote {
+    padding-block: clamp(4rem, 10vw, 8rem);
+    display: flex;
+    justify-content: center;
+  }
+  .quote blockquote {
+    font-size: clamp(1.75rem, 4.5vw, 3.5rem);
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 300;
+    max-width: 22ch;
+    text-align: left;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  .body {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--sp-4);
+    padding-block: var(--sp-8) clamp(4rem, 10vw, 8rem);
+  }
+  @media (min-width: 900px) { .body { grid-template-columns: 220px 1fr; gap: var(--sp-10); } }
+  .prose {
+    max-width: 64ch;
+    font-size: var(--fs-md);
+    line-height: 1.65;
+  }
+  .prose :global(p) { margin-bottom: var(--sp-4); }
+  .prose :global(blockquote) {
+    border-left: 1px solid var(--accent);
+    padding-left: var(--sp-3);
+    margin: var(--sp-6) 0;
+    font-size: var(--fs-lg);
+    line-height: 1.4;
+    color: var(--fg);
+  }
+  .prose :global(strong) { font-weight: 700; }
+  .prose :global(em) { font-style: italic; }
+
+  .gal { display: flex; flex-direction: column; gap: var(--sp-4); padding-block: var(--sp-4); }
+  .gal__item { margin: 0; }
+  .gal__item img { width: 100%; aspect-ratio: 16/10; object-fit: cover; background: var(--subtle); }
+  .gal__item figcaption { font-size: var(--fs-xs); color: var(--muted); padding-top: var(--sp-2); }
+
+  .next {
+    display: block;
+    padding-block: clamp(4rem, 10vw, 8rem);
+    transition: background var(--dur);
+  }
+  .next:hover { background: var(--c-negro); color: var(--c-blanco); }
+  .next__inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--sp-3);
+    align-items: end;
+  }
+  .next__inner .eye { grid-column: 1 / -1; margin-bottom: var(--sp-3); }
+  .next:hover .eye { color: rgba(240,240,240,0.5); }
+  .next__title {
+    font-size: var(--fs-display);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    font-weight: 300;
+  }
+  .next__client { font-size: var(--fs-sm); color: var(--muted); margin-top: var(--sp-2); }
+  .next:hover .next__client { color: rgba(240,240,240,0.5); }
+  .next__arrow {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--muted);
+    align-self: center;
+    transition: transform var(--dur) var(--ease);
+  }
+  .next:hover .next__arrow { color: var(--c-blanco); transform: translateX(20px); }
+</style>

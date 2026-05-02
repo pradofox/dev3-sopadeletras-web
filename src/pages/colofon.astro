@@ -1,0 +1,205 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+const year = new Date().getFullYear();
+---
+
+<Base
+  title="Colofón"
+  description="Cómo está hecho el sitio de sopadeletras®. Stack, tipografía, accesibilidad, créditos."
+  noIndex={false}
+>
+  <section class="head wrap">
+    <p class="eye">Sobre este sitio · v<span class="tabular">{year}.05</span></p>
+    <h1 class="head__title">
+      <span class="light">Colofón</span>
+      <span class="bold">/ ficha técnica.</span>
+    </h1>
+    <p class="head__lede">
+      Lo de un colofón en libros, pero para web. Cómo está hecho, con qué,
+      por quién. Si te interesa el cómo, esto es para ti.
+    </p>
+  </section>
+
+  <hr class="hr" />
+
+  <section class="rows">
+    <article class="row wrap" data-reveal>
+      <div class="row__l"><p class="eye">Stack</p></div>
+      <div class="row__r">
+        <p>
+          Astro <span class="tabular">6</span> en Cloudflare Workers. Server output con
+          prerender en páginas estáticas. Imágenes en R2 propio. Cero dependencia de
+          plataformas tipo Wix, Squarespace o Framer.
+        </p>
+      </div>
+    </article>
+
+    <hr class="hr" />
+
+    <article class="row wrap" data-reveal>
+      <div class="row__l"><p class="eye">Tipografía</p></div>
+      <div class="row__r">
+        <p>
+          <span class="bold">Helvetica Neue</span> en dos pesos:
+          <span class="bold">Light</span> (300) para cuerpo y display,
+          <span class="bold">Bold</span> (700) para énfasis. Servida local en
+          woff2, font-display swap. Es interim. Hay una font custom en
+          desarrollo con un colaborador externo que reemplazará esto cuando llegue.
+        </p>
+      </div>
+    </article>
+
+    <hr class="hr" />
+
+    <article class="row wrap" data-reveal>
+      <div class="row__l"><p class="eye">Color</p></div>
+      <div class="row__r">
+        <p>
+          Negro <span class="tabular">#1d1d1f</span> y blanco
+          <span class="tabular">#f0f0f0</span> como base.
+          Azul <span class="tabular">#1961ae</span> como único acento (un toque por sección).
+          Mismos tokens del dashboard interno de sopa, así un día las dos
+          superficies se sienten parte del mismo sistema.
+        </p>
+      </div>
+    </article>
+
+    <hr class="hr" />
+
+    <article class="row wrap" data-reveal>
+      <div class="row__l"><p class="eye">Motion</p></div>
+      <div class="row__r">
+        <p>
+          Smooth scroll discreto con <span class="bold">Lenis</span> (lib MIT
+          open source de Studio Freight). Reveal sutil al scroll vía
+          IntersectionObserver. Image-follow al hover en la lista de trabajo.
+          Nada agresivo, todo respeta <code>prefers-reduced-motion</code>.
+        </p>
+      </div>
+    </article>
+
+    <hr class="hr" />
+
+    <article class="row wrap" data-reveal>
+      <div class="row__l"><p class="eye">Performance</p></div>
+      <div class="row__r">
+        <p>
+          Build estático servido desde el edge de Cloudflare. View Transitions
+          nativas para navegación tipo SPA sin SPA. Prefetch en viewport.
+          Sin frameworks JavaScript pesados.
+        </p>
+      </div>
+    </article>
+
+    <hr class="hr" />
+
+    <article class="row wrap" data-reveal>
+      <div class="row__l"><p class="eye">Accesibilidad</p></div>
+      <div class="row__r">
+        <p>
+          Contraste mínimo AA. Skip-link al contenido. Targets touch
+          confortables. Respeta <code>prefers-reduced-motion</code>. Soporta
+          navegación por teclado. <span class="bold">Pendiente:</span> auditoría
+          completa con axe + screen reader real.
+        </p>
+      </div>
+    </article>
+
+    <hr class="hr" />
+
+    <article class="row wrap" data-reveal>
+      <div class="row__l"><p class="eye">SEO + AEO</p></div>
+      <div class="row__r">
+        <p>
+          OpenGraph + Twitter Cards en todas las páginas. JSON-LD
+          <span class="bold">Organization</span> en el layout y
+          <span class="bold">CreativeWork</span> por proyecto. Sitemap.
+          robots.txt con allow explícito para GPTBot, ClaudeBot,
+          PerplexityBot y Google-Extended para que aparezcamos en respuestas
+          de IA.
+        </p>
+      </div>
+    </article>
+
+    <hr class="hr" />
+
+    <article class="row wrap" data-reveal>
+      <div class="row__l"><p class="eye">CMS</p></div>
+      <div class="row__r">
+        <p>
+          Por ahora los proyectos viven como markdown en el repo
+          (<code>src/content/portfolio/</code>) con frontmatter para metadata.
+          Próximo paso: conectar Pages CMS para que Lili y futuros colaboradores
+          puedan agregar proyectos vía UI sin tocar código. Mismo schema.
+        </p>
+      </div>
+    </article>
+
+    <hr class="hr" />
+
+    <article class="row wrap" data-reveal>
+      <div class="row__l"><p class="eye">Código</p></div>
+      <div class="row__r">
+        <p>
+          Repo público en
+          <a class="u" href="https://github.com/pradofox/dev3-sopadeletras-web" target="_blank" rel="noopener">github.com/pradofox/dev3-sopadeletras-web</a>.
+          Cualquier feedback, issue o PR bienvenido.
+        </p>
+      </div>
+    </article>
+
+    <hr class="hr" />
+
+    <article class="row wrap" data-reveal>
+      <div class="row__l"><p class="eye">Créditos</p></div>
+      <div class="row__r">
+        <p>
+          Diseño y desarrollo por
+          <a class="u" href="/#equipo">sopadeletras®</a>
+          (Lilian Balderas + Roberto Prado). Construido con
+          <a class="u" href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a>.
+          Inspiración en estudios que admiramos: Locomotive, Order, Mucho, Base.
+        </p>
+      </div>
+    </article>
+  </section>
+</Base>
+
+<style>
+  .head { padding-block: clamp(5rem, 12vw, 9rem) clamp(2rem, 5vw, 4rem); }
+  .head__title {
+    font-size: var(--fs-display);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    font-weight: 300;
+    margin-block: var(--sp-4) var(--sp-5);
+  }
+  .head__title span { display: block; }
+  .head__title .bold { font-weight: 700; color: var(--accent); }
+  .head__lede { font-size: var(--fs-md); color: var(--muted); max-width: 56ch; line-height: 1.55; }
+
+  .rows { padding-bottom: clamp(4rem, 10vw, 8rem); }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--sp-3);
+    padding-block: var(--sp-6);
+  }
+  @media (min-width: 768px) { .row { grid-template-columns: 200px 1fr; gap: var(--sp-8); } }
+  .row__l .eye { font-size: var(--fs-sm); }
+  .row__r p {
+    font-size: var(--fs-md);
+    line-height: 1.65;
+    color: var(--fg);
+    max-width: 64ch;
+  }
+  .row__r .bold { font-weight: 700; }
+  .row__r code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--subtle);
+    padding: 1px 6px;
+    border-radius: 2px;
+  }
+</style>

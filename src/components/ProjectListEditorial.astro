@@ -1,0 +1,199 @@
+---
+// Lista editorial de proyectos: 3 columnas (nombre / categorías / cliente).
+// Tipografía como protagonista, hairlines como separadores, sin thumbnails.
+// En desktop: image-follow al cursor (preview flotante).
+// En mobile: stack con jerarquía clara, nombre grande arriba.
+
+interface Item {
+  href: string;
+  title: string;
+  client: string;
+  categories: string[];
+  cover: string;
+  year?: number;
+}
+interface Props {
+  items: Item[];
+  startIndex?: number;
+  showYear?: boolean;
+}
+const { items, startIndex = 0, showYear = false } = Astro.props;
+---
+
+<section class="ple">
+  <hr class="hr" />
+  <ul class="ple__items" id="ple-list">
+    {items.map((it, i) => {
+      const n = String(startIndex + i + 1).padStart(2, '0');
+      return (
+        <>
+          <li class="ple__item" data-cover={it.cover}>
+            <a href={it.href} class="ple__link">
+              <span class="ple__num tabular eye">{n}</span>
+              <span class="ple__title">{it.title}</span>
+              <span class="ple__cats">{it.categories.join(' / ').toLowerCase()}</span>
+              <span class="ple__client">
+                {it.client}
+                {showYear && it.year && <span class="tabular ple__year"> · {it.year}</span>}
+              </span>
+              <span class="ple__arrow" aria-hidden="true">→</span>
+              <img class="ple__inline" src={it.cover} alt="" loading="lazy" />
+            </a>
+          </li>
+          <hr class="hr" />
+        </>
+      );
+    })}
+  </ul>
+
+  <div class="ple__follower" id="ple-follower" aria-hidden="true">
+    <img id="ple-follower-img" alt="" />
+  </div>
+</section>
+
+<style>
+  .ple { position: relative; }
+  .ple__items { list-style: none; padding: 0; margin: 0; }
+  .ple__item { /* sin border, lo da el .hr externo */ }
+
+  .ple__link {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--sp-3);
+    align-items: baseline;
+    padding: var(--sp-5) var(--gutter);
+    transition: padding var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+  /* Mobile layout: nombre grande arriba, debajo cats + client en línea */
+  .ple__num { grid-column: 1; grid-row: 1; align-self: start; padding-top: 4px; }
+  .ple__title { grid-column: 2 / 4; grid-row: 1; }
+  .ple__cats { grid-column: 2 / 4; grid-row: 2; }
+  .ple__client { grid-column: 2 / 4; grid-row: 3; }
+  .ple__arrow { display: none; }
+  .ple__inline { display: none; }
+
+  @media (min-width: 900px) {
+    .ple__link {
+      grid-template-columns: 50px minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+      gap: var(--sp-6);
+      padding: var(--sp-4) var(--gutter);
+      align-items: center;
+    }
+    .ple__num { grid-column: 1; grid-row: 1; align-self: center; padding-top: 0; }
+    .ple__title { grid-column: 2; grid-row: 1; }
+    .ple__cats { grid-column: 3; grid-row: 1; }
+    .ple__client { grid-column: 4; grid-row: 1; text-align: right; }
+    .ple__arrow {
+      display: inline-block;
+      grid-column: 5; grid-row: 1;
+      font-size: var(--fs-lg);
+      color: var(--muted);
+      transform: translateX(-6px);
+      opacity: 0;
+      transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+    }
+  }
+
+  .ple__link:hover {
+    padding-left: calc(var(--gutter) + var(--sp-3));
+  }
+  .ple__link:hover .ple__title { color: var(--accent); }
+  .ple__link:hover .ple__arrow {
+    opacity: 1;
+    transform: translateX(0);
+    color: var(--accent);
+  }
+
+  /* Tipografía */
+  .ple__title {
+    font-size: clamp(1.625rem, 4.5vw, 2.75rem);
+    font-weight: 300;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+  }
+  .ple__cats {
+    font-size: var(--fs-sm);
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .ple__client {
+    font-size: var(--fs-sm);
+    color: var(--fg);
+    font-weight: 400;
+  }
+  .ple__year { color: var(--muted); }
+
+  /* Mobile: nombre del proyecto sigue siendo grande, jerarquía no se rompe */
+  @media (max-width: 899px) {
+    .ple__link { padding-block: var(--sp-5) var(--sp-5); }
+    .ple__title { font-size: clamp(1.75rem, 7vw, 2.5rem); margin-bottom: var(--sp-2); }
+    .ple__cats { margin-bottom: 4px; }
+    .ple__client { color: var(--muted); }
+  }
+
+  /* Image follower (desktop only) */
+  .ple__follower {
+    position: fixed;
+    top: 0; left: 0;
+    width: clamp(200px, 22vw, 340px);
+    aspect-ratio: 4/5;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(0.95);
+    transition: opacity 280ms var(--ease), transform 500ms var(--ease);
+    z-index: 30;
+    overflow: hidden;
+    background: var(--subtle);
+    will-change: transform;
+  }
+  .ple__follower.is-on {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale(1);
+  }
+  .ple__follower img { width: 100%; height: 100%; object-fit: cover; }
+  @media (max-width: 899px), (hover: none) { .ple__follower { display: none; } }
+</style>
+
+<script>
+  const init = () => {
+    const list = document.getElementById('ple-list');
+    const follower = document.getElementById('ple-follower');
+    const img = document.getElementById('ple-follower-img') as HTMLImageElement | null;
+    if (!list || !follower || !img) return;
+    if (window.matchMedia('(hover: none)').matches) return;
+    if (window.matchMedia('(max-width: 899px)').matches) return;
+
+    const target = { x: window.innerWidth * 0.7, y: window.innerHeight * 0.5 };
+    const pos = { x: target.x, y: target.y };
+    let raf = 0;
+
+    const tick = () => {
+      pos.x += (target.x - pos.x) * 0.16;
+      pos.y += (target.y - pos.y) * 0.16;
+      const scale = follower.classList.contains('is-on') ? 1 : 0.95;
+      follower.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) scale(${scale})`;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+
+    list.querySelectorAll<HTMLLIElement>('.ple__item').forEach((li) => {
+      const cover = li.dataset.cover;
+      li.addEventListener('mouseenter', () => {
+        if (!cover) return;
+        if (img.src.indexOf(cover) === -1) img.src = cover;
+        follower.classList.add('is-on');
+      });
+      li.addEventListener('mouseleave', () => {
+        follower.classList.remove('is-on');
+      });
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      target.x = e.clientX;
+      target.y = e.clientY;
+    });
+  };
+
+  document.addEventListener('astro:page-load', init);
+  init();
+</script>

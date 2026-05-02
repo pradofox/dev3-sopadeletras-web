@@ -1,0 +1,298 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectListEditorial from '../components/ProjectListEditorial.astro';
+import Status from '../components/Status.astro';
+import { getCollection } from 'astro:content';
+import { team } from '../data/team';
+import { awards } from '../data/awards';
+
+export const prerender = true;
+
+const portfolio = (await getCollection('portfolio'))
+  .filter(p => !p.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const featured = portfolio.slice(0, 5).map(p => ({
+  href: `/trabajo/${p.id}`,
+  title: p.data.title,
+  client: p.data.client,
+  categories: p.data.categories,
+  cover: p.data.cover,
+  year: p.data.year,
+}));
+---
+
+<Base>
+  <!-- HERO MINIMAL -->
+  <section class="hero wrap">
+    <p class="eye hero__eye">Estudio creativo · Monterrey, MX · est. <span class="tabular">2017</span></p>
+
+    <h1 class="hero__title">
+      <span class="hero__line">Convertimos</span>
+      <span class="hero__line">ideas en buenas</span>
+      <span class="hero__line">ideas <span class="hero__wink" aria-hidden="true">;)</span></span>
+    </h1>
+
+    <div class="hero__bot">
+      <div class="hero__lede">
+        <p>
+          Acompañamos a marcas, instituciones y proyectos culturales con
+          <strong class="bold">estrategia creativa</strong>,
+          <strong class="bold">diseño</strong> y
+          <strong class="bold">producción audiovisual</strong>.
+          Desde Monterrey, para todos lados.
+        </p>
+      </div>
+      <Status />
+    </div>
+  </section>
+
+  <hr class="hr" />
+
+  <!-- TRABAJO seleccionado -->
+  <section id="trabajo">
+    <header class="sec wrap">
+      <p class="eye">Trabajo<span class="tabular">({portfolio.length})</span></p>
+      <h2 class="sec__title">
+        <span class="bold">Recientes</span>
+        <span class="sec__title-meta tabular">/ 2024–2025</span>
+      </h2>
+    </header>
+
+    <ProjectListEditorial items={featured} />
+
+    <div class="wrap sec__more" data-reveal>
+      <a href="/trabajo" class="more">
+        <span>Ver los <span class="tabular">{portfolio.length}</span> proyectos</span>
+        <span class="more__arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
+
+  <hr class="hr" />
+
+  <!-- NOSOTROS -->
+  <section id="nosotros" class="wrap sec sec--np">
+    <header class="sec__head">
+      <p class="eye">Nosotros</p>
+    </header>
+
+    <p class="manifesto" data-reveal>
+      Hacemos cosas que <span class="bold">se ven serias</span> porque
+      nos las tomamos en serio. Pero por dentro somos
+      <span class="manifesto__alt">cero serios</span><span class="hero__wink">;)</span>
+      Ese es el encanto sopa.
+    </p>
+
+    <div class="cols-2" data-reveal style="--reveal-delay: 200ms">
+      <div>
+        <p class="eye">Estudio pequeño, ágil</p>
+        <p class="cols-2__p">
+          Cuando contratas a sopadeletras® no te toca un junior. Te toca el equipo entero,
+          de principio a fin. Trabajamos con cuidado, sin perder velocidad.
+        </p>
+      </div>
+      <div>
+        <p class="eye">Multidisciplinario</p>
+        <p class="cols-2__p">
+          Estrategia, branding, diseño, foto y video, web, editorial.
+          Hacemos lo que el proyecto necesita, no lo que nos toque ofrecer.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hr" />
+
+  <!-- EQUIPO -->
+  <section id="equipo" class="wrap sec sec--np">
+    <header class="sec__head">
+      <p class="eye">Equipo<span class="tabular">({team.length})</span></p>
+    </header>
+
+    <div class="team">
+      {team.map((m, i) => (
+        <article class="member" data-reveal style={`--reveal-delay: ${i * 120}ms`}>
+          <span class="member__num eye tabular">{String(i+1).padStart(2,'0')} / {String(team.length).padStart(2,'0')}</span>
+          <h3 class="member__name">{m.name}</h3>
+          <p class="member__role">{m.role}</p>
+          <blockquote class="member__quote">"{m.quote}"</blockquote>
+          <ul class="member__links">
+            {m.instagram && <li><a class="u" href={m.instagram} target="_blank" rel="noopener">Instagram</a></li>}
+            {m.linkedin && <li><a class="u" href={m.linkedin} target="_blank" rel="noopener">LinkedIn</a></li>}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <hr class="hr" />
+
+  <!-- PREMIOS -->
+  <section id="premios" class="sec sec--np">
+    <header class="wrap sec__head">
+      <p class="eye">Reconocimientos<span class="tabular">({awards.length})</span></p>
+    </header>
+
+    <ul class="awards">
+      {awards.map(a => (
+        <li class="award" data-reveal>
+          <a class="award__row wrap" href="#" tabindex="-1">
+            <span class="award__year tabular">{a.year}</span>
+            <span class="award__name"><span class="bold">{a.award}</span>{a.level && <span class="award__level"> · {a.level}</span>}</span>
+            <span class="award__project">{a.project}</span>
+            <span class="award__cat">{a.category}</span>
+          </a>
+          <hr class="hr" />
+        </li>
+      ))}
+    </ul>
+  </section>
+</Base>
+
+<style>
+  /* HERO */
+  .hero {
+    padding-block: clamp(4rem, 10vw, 8rem) clamp(3rem, 7vw, 6rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-8);
+  }
+  .hero__eye { margin-bottom: var(--sp-4); }
+  .hero__title {
+    font-size: var(--fs-display);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    font-weight: 300;
+  }
+  .hero__line { display: block; }
+  .hero__wink { color: var(--accent); display: inline-block; margin-left: 0.04em; }
+
+  .hero__bot {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--sp-5);
+    margin-top: var(--sp-4);
+  }
+  @media (min-width: 900px) {
+    .hero__bot { grid-template-columns: 1.4fr 1fr; align-items: end; gap: var(--sp-10); }
+  }
+  .hero__lede p {
+    max-width: 50ch;
+    font-size: var(--fs-md);
+    line-height: 1.55;
+    color: var(--muted);
+  }
+  .hero__lede strong { color: var(--fg); font-weight: 700; }
+
+  /* Section base */
+  .sec { padding-block: clamp(3rem, 6vw, 5rem); }
+  .sec--np { padding-block: clamp(3rem, 6vw, 5rem); }
+  .sec__head { margin-bottom: var(--sp-6); display: flex; flex-direction: column; gap: var(--sp-2); }
+  .sec__title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-3);
+    flex-wrap: wrap;
+  }
+  .sec__title .bold { font-weight: 700; }
+  .sec__title-meta { font-size: var(--fs-md); color: var(--muted); font-weight: 300; }
+
+  .sec__more { padding-top: var(--sp-6); display: flex; justify-content: flex-end; }
+  .more {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-md);
+    color: var(--fg);
+    transition: color var(--dur);
+  }
+  .more__arrow { transition: transform var(--dur) var(--ease); }
+  .more:hover { color: var(--accent); }
+  .more:hover .more__arrow { transform: translateX(4px); }
+
+  /* Manifesto */
+  .manifesto {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    font-weight: 300;
+    color: var(--fg);
+    max-width: 32ch;
+    margin-bottom: var(--sp-10);
+  }
+  .manifesto .bold { font-weight: 700; }
+  .manifesto__alt { color: var(--accent); }
+
+  .cols-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--sp-6);
+    border-top: 1px solid var(--hairline);
+    padding-top: var(--sp-5);
+  }
+  @media (min-width: 720px) { .cols-2 { grid-template-columns: 1fr 1fr; gap: var(--sp-10); } }
+  .cols-2 .eye { margin-bottom: var(--sp-2); }
+  .cols-2__p { font-size: var(--fs-md); line-height: 1.5; max-width: 38ch; color: var(--fg); }
+
+  /* Equipo */
+  .team {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--sp-8);
+    border-top: 1px solid var(--hairline);
+    padding-top: var(--sp-5);
+  }
+  @media (min-width: 768px) { .team { grid-template-columns: 1fr 1fr; gap: var(--sp-10); } }
+  .member { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .member__num { font-size: var(--fs-xs); }
+  .member__name {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 300;
+    letter-spacing: -0.025em;
+  }
+  .member__role { color: var(--muted); font-size: var(--fs-md); }
+  .member__quote {
+    margin: 0;
+    font-size: var(--fs-md);
+    color: var(--fg);
+    border-left: 1px solid var(--accent);
+    padding-left: var(--sp-3);
+    line-height: 1.45;
+    max-width: 38ch;
+  }
+  .member__links { list-style: none; padding: 0; margin: 0; display: flex; gap: var(--sp-4); font-size: var(--fs-sm); }
+
+  /* Premios — toda la fila como una sola línea legible */
+  .awards { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--hairline); }
+  .award__row {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: var(--sp-3);
+    padding-block: var(--sp-4);
+    align-items: baseline;
+    pointer-events: none;
+  }
+  .award__year { grid-column: 1; grid-row: 1 / span 3; font-size: var(--fs-lg); }
+  .award__name { grid-column: 2; grid-row: 1; font-size: var(--fs-md); }
+  .award__name .bold { font-weight: 700; }
+  .award__level { color: var(--accent); }
+  .award__project, .award__cat { grid-column: 2; font-size: var(--fs-sm); color: var(--muted); }
+  .award__project { grid-row: 2; }
+  .award__cat { grid-row: 3; }
+
+  @media (min-width: 900px) {
+    .award__row {
+      grid-template-columns: 90px minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1.5fr);
+      align-items: center;
+    }
+    .award__year { grid-column: 1; grid-row: 1; font-size: var(--fs-xl); }
+    .award__name { grid-column: 2; grid-row: 1; }
+    .award__project { grid-column: 3; grid-row: 1; color: var(--fg); }
+    .award__cat { grid-column: 4; grid-row: 1; text-align: right; }
+  }
+</style>
