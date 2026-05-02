@@ -55,16 +55,18 @@ const links = [
    * sobre secciones marcadas data-bg="dark".
    */
   .hdr {
-    position: sticky;
-    top: 0;
+    position: fixed;
+    top: 0; left: 0; right: 0;
     z-index: 50;
-    background: var(--bg);
-    transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+    background: transparent;
+    pointer-events: none;
+    transition: color var(--dur) var(--ease);
   }
   .hdr[data-theme="dark"] {
-    background: transparent;
     color: var(--c-blanco);
   }
+  /* Reactivamos pointer-events solo en los hijos interactivos */
+  .hdr__brand, .hdr__nav, .hdr__menu, .hdr__link { pointer-events: auto; }
 
   .hdr__row {
     display: grid;

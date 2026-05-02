@@ -36,6 +36,10 @@ const featured = portfolio.slice(0, 5).map(p => ({
     </div>
 
     <div class="hero__stage">
+      <!-- Grid 2x2: ideas top-right (escalón alto), buenas bot-left
+           (escalón bajo). El señor en overlay centrado encima. -->
+      <span class="hero__cell hero__cell--top">ideas&nbsp;<Wink /></span>
+      <span class="hero__cell hero__cell--bot">buenas</span>
       <img
         src="/images/decor/senor-byn.png"
         alt=""
@@ -44,8 +48,6 @@ const featured = portfolio.slice(0, 5).map(p => ({
         decoding="async"
         draggable="false"
       />
-      <span class="hero__step hero__step--top">ideas <Wink /></span>
-      <span class="hero__step hero__step--bot">buenas</span>
     </div>
 
     <div class="hero__wordmark" aria-hidden="true">
@@ -190,51 +192,65 @@ const featured = portfolio.slice(0, 5).map(p => ({
     color: var(--fg);
   }
 
+  /* Stage como grid 2x2: las palabras viven en celdas naturales,
+     "ideas ;)" arriba-derecha y "buenas" abajo-izquierda. El señor
+     en overlay absolute centrado encima. Sin coords mágicas: el
+     layout se acomoda solo según el viewport. */
   .hero__stage {
     position: relative;
     grid-row: 1;
     align-self: end;
     width: 100%;
-    height: 100%;
     min-height: clamp(380px, 65vh, 620px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
   }
 
-  /* El señor: anclado al bottom, hacia la derecha del centro,
-     altura grande para que las palabras lo "abracen". */
+  .hero__cell {
+    font-size: clamp(1.5rem, 2.8vw, 2.5rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--fg);
+    z-index: 2;
+    display: flex;
+    padding: var(--sp-3);
+  }
+  /* Escalón superior (cuadrante derecho-arriba):
+     centrado vertical de su celda → queda en y≈25% del stage.
+     justify-start → queda hacia el centro horizontal. */
+  .hero__cell--top {
+    grid-row: 1;
+    grid-column: 2;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: var(--sp-5);
+  }
+  /* Escalón inferior (cuadrante izquierdo-abajo):
+     centrado vertical de su celda → queda en y≈75% del stage.
+     justify-end → queda hacia el centro horizontal. */
+  .hero__cell--bot {
+    grid-row: 2;
+    grid-column: 1;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: var(--sp-5);
+  }
+
+  /* El señor: overlay absolute centrado horizontal, parado en el bottom. */
   .hero__senor {
     position: absolute;
-    right: clamp(20%, 28vw, 32%);
+    left: 50%;
     bottom: 0;
-    height: clamp(300px, 60vh, 540px);
+    transform: translateX(-50%);
+    height: 100%;
+    max-height: clamp(300px, 60vh, 540px);
     width: auto;
     object-fit: contain;
     user-select: none;
     pointer-events: none;
     z-index: 1;
-  }
-
-  .hero__step {
-    position: absolute;
-    font-size: clamp(1.5rem, 2.8vw, 2.5rem);
-    font-weight: 300;
-    line-height: 1;
-    letter-spacing: -0.025em;
-    z-index: 2;
-    white-space: nowrap;
-    color: var(--fg);
-  }
-  /* "ideas ;)" arriba a la derecha del señor — alineado con el pie
-     de adelante (que está levantado, ~60% de la altura del señor). */
-  .hero__step--top {
-    bottom: clamp(38%, 35vh, 50%);
-    right: clamp(2%, 6vw, 10%);
-  }
-  /* "buenas" abajo a la izquierda del señor — alineado con el pie
-     de atrás (que está pegado al suelo). El texto sirve de "escalón"
-     debajo del señor. */
-  .hero__step--bot {
-    bottom: clamp(0.5rem, 2vh, 1.5rem);
-    right: clamp(38%, 46vw, 54%);
   }
 
   /* WORDMARK GIGANTE pisado al bottom, full-width */
@@ -268,15 +284,8 @@ const featured = portfolio.slice(0, 5).map(p => ({
       grid-row: 2;
       min-height: clamp(340px, 52vh, 460px);
     }
-    .hero__senor {
-      right: 30%;
-      height: clamp(260px, 46vh, 380px);
-    }
-    .hero__step {
-      font-size: clamp(1.375rem, 6.5vw, 2rem);
-    }
-    .hero__step--top { bottom: 38%; right: 4%; }
-    .hero__step--bot { bottom: 0.5rem; right: 50%; }
+    .hero__senor { max-height: clamp(260px, 46vh, 380px); }
+    .hero__cell { font-size: clamp(1.25rem, 6vw, 1.75rem); }
     .hero__wordmark { grid-row: 3; padding-bottom: var(--sp-3); }
   }
 
