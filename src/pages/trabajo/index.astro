@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import ProjectListEditorial from '../../components/ProjectListEditorial.astro';
+import Logo from '../../components/Logo.astro';
 import { getCollection } from 'astro:content';
 
 export const prerender = true;
@@ -23,32 +24,24 @@ const items = portfolio.map(p => ({
   title="Trabajo"
   description="Portafolio de sopadeletras®. Proyectos de estrategia creativa, branding, diseño y producción audiovisual para marcas e instituciones."
 >
-  <section class="head wrap">
-    <p class="eye">Portafolio · <span class="tabular">{items.length}</span> proyectos · 2017→2026</p>
-    <h1 class="head__title">
-      <span class="light">Todo el</span>
-      <span class="bold">trabajo</span>
-    </h1>
-    <p class="head__lede">
-      Una selección de los proyectos que sí publicamos. Si no ves algo
-      que viste por ahí, probablemente está bajo NDA o lo estamos puliendo
-      para subirlo aquí.
-    </p>
+  <section class="head">
+    <h1 class="head__title" aria-label="Trabajo">trabajo</h1>
   </section>
 
   <ProjectListEditorial items={items} showYear={true} />
 </Base>
 
 <style>
-  .head { padding-block: clamp(5rem, 12vw, 9rem) clamp(2rem, 5vw, 4rem); }
-  .head__title {
-    font-size: var(--fs-display);
-    line-height: 0.95;
-    letter-spacing: -0.04em;
-    font-weight: 300;
-    margin-block: var(--sp-4) var(--sp-5);
+  .head {
+    padding: clamp(2rem, 6vh, 5rem) var(--gutter) clamp(0.5rem, 1.5vh, 1rem);
+    line-height: 0.85;
   }
-  .head__title span { display: block; }
-  .head__title .bold { font-weight: 700; color: var(--accent); }
-  .head__lede { font-size: var(--fs-md); color: var(--muted); max-width: 56ch; line-height: 1.55; }
+  .head__title {
+    font-size: clamp(4.5rem, 22vw, 18rem);
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+    font-weight: 300;
+    color: var(--fg);
+    margin: 0;
+  }
 </style>

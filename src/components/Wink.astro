@@ -1,34 +1,25 @@
 ---
-// Wink microinteracción: el ";)" parpadea a ":)" cada 3-6s.
-// Implementación simple: JS swap del textContent.
+// Wink simétrico, ritmo de reloj digital. Cada 1s alterna `;)` y `:)`.
+// Todas las instancias de la página usan el MISMO heartbeat para que
+// se vea coordinado (como los `:` de un reloj).
 ---
 <span class="wink" data-wink aria-hidden="true">;)</span>
 
 <style>
-  .wink {
-    display: inline-block;
-    transform: translateY(-0.04em);
-    transition: opacity 80ms var(--ease);
-  }
-  .wink.is-blink { opacity: 0.92; }
+  .wink { display: inline-block; transform: translateY(-0.04em); }
 </style>
 
-<script>
-  const init = () => {
-    document.querySelectorAll<HTMLElement>('[data-wink]').forEach((el) => {
-      // Cada wink con su propio delay random para que no se sincronicen
-      const cycle = 3200 + Math.random() * 3000;
-      const tick = () => {
-        el.classList.add('is-blink');
-        // primero a un punto (de transición), luego a :), luego vuelve a ;)
-        setTimeout(() => { el.textContent = ':)'; }, 50);
-        setTimeout(() => { el.textContent = ';)'; el.classList.remove('is-blink'); }, 220);
-      };
-      const handle = setInterval(tick, cycle);
-      // limpiar al cambio de página (View Transitions)
-      document.addEventListener('astro:before-swap', () => clearInterval(handle), { once: true });
-    });
-  };
-  document.addEventListener('astro:page-load', init);
-  init();
+<script is:inline>
+  // Heartbeat global, una sola fuente de verdad. Si ya está montado por
+  // otra instancia, reusa.
+  (() => {
+    if ((window).__sopaWinkBeat) return;
+    let on = true;
+    setInterval(() => {
+      on = !on;
+      const winks = document.querySelectorAll('[data-wink]');
+      winks.forEach((el) => { el.textContent = on ? ';)' : ':)'; });
+    }, 1000);
+    (window).__sopaWinkBeat = true;
+  })();
 </script>

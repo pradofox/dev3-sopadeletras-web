@@ -12,7 +12,7 @@ const links = [
 ];
 ---
 
-<header class="hdr">
+<header class="hdr" data-theme="light">
   <div class="hdr__row">
     <a href="/" class="hdr__brand bold" aria-label={`${site.name} — inicio`}>
       <Logo class="hdr__logo" />
@@ -32,34 +32,40 @@ const links = [
       <span>menú</span>
     </button>
   </div>
-
-  <div class="hdr__sheet" id="menu-sheet" hidden>
-    <ul>
-      <li><a href="/">casa</a></li>
-      <li><a href="/trabajo">trabajo</a></li>
-      <li><a href="/#nosotros">nosotros</a></li>
-      <li><a href="/#equipo">equipo</a></li>
-      <li><a href="/#premios">premios</a></li>
-      <li><a href="/colofon">colofón</a></li>
-      <li><a href="/contacto">contacto</a></li>
-    </ul>
-    <a href={`mailto:${site.email}`} class="hdr__sheet-mail u">{site.email}</a>
-  </div>
 </header>
 
+<!-- Mobile sheet — sibling del header para evitar problemas de inheritance -->
+<div class="sheet" id="menu-sheet" hidden>
+  <ul class="sheet__list">
+    <li><a href="/">casa</a></li>
+    <li><a href="/trabajo">trabajo</a></li>
+    <li><a href="/#nosotros">nosotros</a></li>
+    <li><a href="/#equipo">equipo</a></li>
+    <li><a href="/#premios">premios</a></li>
+    <li><a href="/colofon">colofón</a></li>
+    <li><a href="/contacto">contacto</a></li>
+  </ul>
+  <a href={`mailto:${site.email}`} class="sheet__mail u">{site.email}</a>
+</div>
+
 <style>
-  /* Header con mix-blend-mode: difference para que logo + items se inviertan
-   * automático según el fondo. Sobre claro = se ve negro, sobre oscuro = se
-   * ve blanco. Sin JS de detección de fondo.
+  /* Header sin mix-blend-mode. Items con bg gris translúcido,
+   * texto negro. Logo cambia color (negro/blanco) según el [data-theme]
+   * del header, que se actualiza por IntersectionObserver al pasar
+   * sobre secciones marcadas data-bg="dark".
    */
   .hdr {
-    position: fixed;
-    top: 0; left: 0; right: 0;
+    position: sticky;
+    top: 0;
     z-index: 50;
-    pointer-events: none;
-    mix-blend-mode: difference;
-    color: #fff;
+    background: var(--bg);
+    transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
   }
+  .hdr[data-theme="dark"] {
+    background: transparent;
+    color: var(--c-blanco);
+  }
+
   .hdr__row {
     display: grid;
     grid-template-columns: auto 1fr auto;
@@ -67,15 +73,16 @@ const links = [
     gap: var(--sp-3);
     padding: var(--sp-4) var(--gutter) var(--sp-3);
   }
-  .hdr__brand, .hdr__nav, .hdr__menu { pointer-events: auto; }
 
   .hdr__brand { display: inline-flex; align-items: center; }
   :global(.hdr__logo) {
     display: block;
     height: 18px;
     width: auto;
-    color: #fff;
+    color: var(--fg);
+    transition: color var(--dur) var(--ease);
   }
+  .hdr[data-theme="dark"] :global(.hdr__logo) { color: var(--c-blanco); }
   @media (min-width: 768px) { :global(.hdr__logo) { height: 22px; } }
 
   .hdr__nav {
@@ -85,73 +92,115 @@ const links = [
     align-items: center;
   }
   .hdr__link {
-    /* Items con bg translúcido. Al verse a través de difference, el fondo
-       gris del bg se ve como un pillbox sutil sobre cualquier color. */
-    background: rgba(255, 255, 255, 0.55);
-    color: #fff;
+    background: rgba(29, 29, 31, 0.07);
+    color: var(--fg);
     padding: 6px 14px;
-    border-radius: 0;
     font-size: var(--fs-md);
-    transition: background var(--dur) var(--ease);
     line-height: 1.2;
+    transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
   }
-  .hdr__link:hover { background: rgba(255, 255, 255, 0.85); }
-  .hdr__link.is-on { background: rgba(255, 255, 255, 0.95); }
+  .hdr__link:hover { background: rgba(29, 29, 31, 0.14); }
+  .hdr__link.is-on { background: rgba(29, 29, 31, 0.18); }
+  .hdr[data-theme="dark"] .hdr__link {
+    background: rgba(240, 240, 240, 0.18);
+    color: var(--c-blanco);
+  }
+  .hdr[data-theme="dark"] .hdr__link:hover { background: rgba(240, 240, 240, 0.32); }
 
   .hdr__menu {
     font-size: var(--fs-md);
     padding: var(--sp-2) 0;
-    color: #fff;
+    color: var(--fg);
+    transition: color var(--dur) var(--ease);
   }
+  .hdr[data-theme="dark"] .hdr__menu { color: var(--c-blanco); }
 
   @media (min-width: 768px) {
     .hdr__nav { display: inline-flex; }
     .hdr__menu { display: none; }
   }
 
-  /* Spacer global: que main no quede tapado por el header fixed */
+  /* Spacer para que el contenido no quede tapado */
   :global(main) { padding-top: 56px; }
   @media (min-width: 768px) { :global(main) { padding-top: 64px; } }
 
-  .hdr__sheet {
-    background: var(--bg);
-    color: var(--fg);
-    padding: var(--sp-4) var(--gutter) var(--sp-6);
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-4);
-    border-top: 1px solid var(--hairline);
-    pointer-events: auto;
-    mix-blend-mode: normal;
+  /* ============ MOBILE SHEET ============ */
+  .sheet {
     position: fixed;
     inset: 56px 0 0 0;
-    z-index: 40;
+    z-index: 60;
+    background: var(--bg);
+    color: var(--fg);
+    padding: var(--sp-6) var(--gutter);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow-y: auto;
   }
-  .hdr__sheet[hidden] { display: none; }
-  .hdr__sheet ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--sp-2); }
-  .hdr__sheet ul a { font-size: var(--fs-2xl); letter-spacing: -0.03em; font-weight: 300; }
-  .hdr__sheet-mail { font-size: var(--fs-md); color: var(--muted); margin-top: var(--sp-3); align-self: flex-start; }
-  @media (min-width: 768px) { .hdr__sheet { display: none !important; } }
+  .sheet[hidden] { display: none; }
+  .sheet__list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--sp-3); }
+  .sheet__list a { font-size: var(--fs-2xl); letter-spacing: -0.03em; font-weight: 300; }
+  .sheet__mail { font-size: var(--fs-md); color: var(--muted); margin-top: var(--sp-6); align-self: flex-start; padding-bottom: var(--sp-6); }
+  @media (min-width: 768px) { .sheet { display: none !important; } }
 </style>
 
 <script>
+  // Toggle del menú mobile
   const initMenu = () => {
     const btn = document.getElementById('menu-toggle');
     const sheet = document.getElementById('menu-sheet');
     if (!btn || !sheet) return;
-    btn.addEventListener('click', () => {
-      const open = btn.getAttribute('aria-expanded') === 'true';
-      btn.setAttribute('aria-expanded', String(!open));
-      if (open) sheet.setAttribute('hidden', '');
-      else sheet.removeAttribute('hidden');
-      document.body.style.overflow = open ? '' : 'hidden';
-    });
-    sheet.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+
+    const close = () => {
       btn.setAttribute('aria-expanded', 'false');
       sheet.setAttribute('hidden', '');
       document.body.style.overflow = '';
+    };
+    const open = () => {
+      btn.setAttribute('aria-expanded', 'true');
+      sheet.removeAttribute('hidden');
+      document.body.style.overflow = 'hidden';
+    };
+
+    btn.addEventListener('click', () => {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      if (expanded) close(); else open();
+    });
+    sheet.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      // pequeño delay para dejar que la navegación arranque
+      setTimeout(close, 80);
     }));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') close();
+    });
+    document.addEventListener('astro:before-swap', close, { once: true });
   };
-  document.addEventListener('astro:page-load', initMenu);
+
+  // Logo cambia color según fondo: detectamos si el header está sobre
+  // una sección con data-bg="dark" usando IntersectionObserver.
+  const initThemeSwap = () => {
+    const hdr = document.querySelector<HTMLElement>('.hdr');
+    if (!hdr) return;
+    const targets = document.querySelectorAll<HTMLElement>('[data-bg="dark"]');
+    if (!targets.length) {
+      hdr.dataset.theme = 'light';
+      return;
+    }
+    const headerH = hdr.offsetHeight || 56;
+    const io = new IntersectionObserver((entries) => {
+      // el header está "sobre" una sección dark si la sección intersecta
+      // la zona top del viewport (donde vive el header sticky)
+      const anyDark = Array.from(entries).some(e => e.isIntersecting);
+      if (anyDark) hdr.dataset.theme = 'dark';
+      else hdr.dataset.theme = 'light';
+    }, {
+      rootMargin: `-${headerH - 1}px 0px -${window.innerHeight - headerH - 1}px 0px`,
+      threshold: 0,
+    });
+    targets.forEach(t => io.observe(t));
+  };
+
+  document.addEventListener('astro:page-load', () => { initMenu(); initThemeSwap(); });
   initMenu();
+  initThemeSwap();
 </script>
