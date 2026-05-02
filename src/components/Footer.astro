@@ -1,5 +1,7 @@
 ---
 import { site } from '../data/site';
+import Logo from './Logo.astro';
+import Wink from './Wink.astro';
 const year = new Date().getFullYear();
 ---
 
@@ -39,7 +41,7 @@ const year = new Date().getFullYear();
     <div>
       <p class="eye">Estado</p>
       <ul>
-        <li>Disponibles para colaborar <span class="ftr__dot" aria-hidden="true"></span></li>
+        <li>Disponibles para colaborar</li>
         <li>Versión <span class="tabular">v{year}.05</span></li>
       </ul>
     </div>
@@ -59,7 +61,7 @@ const year = new Date().getFullYear();
     <span class="ftr__sep" aria-hidden="true">·</span>
     <span class="tabular">© {year}</span>
     <span class="ftr__sep" aria-hidden="true">·</span>
-    <span>Hecho con cariño desde MTY <span class="ftr__wink">;)</span></span>
+    <span>Hecho con cariño desde MTY <Wink /></span>
   </p>
 </footer>
 
@@ -76,21 +78,22 @@ const year = new Date().getFullYear();
     display: inline-flex;
     align-items: baseline;
     gap: var(--sp-3);
-    transition: color var(--dur);
+    transition: opacity var(--dur);
     word-break: break-word;
   }
-  .ftr__mail .serif {
+  .ftr__mail .bold {
     font-size: clamp(2.5rem, 9vw, 7rem);
     line-height: 0.95;
     letter-spacing: -0.03em;
+    font-weight: 700;
   }
   .ftr__arrow {
     font-size: clamp(1.5rem, 4vw, 3rem);
     color: var(--muted);
-    transition: transform var(--dur) var(--ease), color var(--dur);
+    transition: transform var(--dur) var(--ease);
   }
-  .ftr__mail:hover { color: var(--accent); }
-  .ftr__mail:hover .ftr__arrow { transform: translateX(8px); color: var(--accent); }
+  .ftr__mail:hover { opacity: 0.65; }
+  .ftr__mail:hover .ftr__arrow { transform: translateX(8px); }
 
   .ftr__cols {
     display: grid;
@@ -100,15 +103,6 @@ const year = new Date().getFullYear();
   }
   @media (min-width: 720px) { .ftr__cols { grid-template-columns: repeat(3, 1fr); gap: var(--sp-8); } }
   .ftr__cols ul { list-style: none; padding: 0; margin: var(--sp-3) 0 0; display: flex; flex-direction: column; gap: 4px; font-size: var(--fs-md); }
-  .ftr__dot {
-    display: inline-block;
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--c-verde);
-    margin-left: 6px;
-    vertical-align: middle;
-    animation: pulse 2.4s ease-in-out infinite;
-  }
-  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 
   .ftr__address {
     padding: var(--sp-5) var(--gutter) var(--sp-6);
@@ -120,8 +114,7 @@ const year = new Date().getFullYear();
     gap: var(--sp-2);
     align-items: baseline;
   }
-  .ftr__address .serif { color: var(--fg); font-size: var(--fs-md); }
+  .ftr__address .bold { color: var(--fg); font-size: var(--fs-md); }
   .ftr__address .ftr__place { color: var(--fg); }
   .ftr__sep { opacity: 0.5; }
-  .ftr__wink { color: var(--accent); }
 </style>

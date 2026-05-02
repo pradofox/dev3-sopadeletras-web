@@ -1,8 +1,10 @@
 ---
-// Lista editorial de proyectos: 3 columnas (nombre / categorías / cliente).
-// Tipografía como protagonista, hairlines como separadores, sin thumbnails.
-// En desktop: image-follow al cursor (preview flotante).
-// En mobile: stack con jerarquía clara, nombre grande arriba.
+// Lista editorial de proyectos.
+// Desktop (>=900px): 4 columnas tipográficas (núm / nombre / cat / cliente) +
+//   image-follow flotante al cursor en hover. Sin imágenes inline.
+// Mobile (<900px): cada item es row con texto a la izquierda + imagen real
+//   del proyecto a la derecha + (+) icon arriba derecha.
+//   Estructura adaptada porque en mobile no hay hover.
 
 interface Item {
   href: string;
@@ -36,8 +38,15 @@ const { items, startIndex = 0, showYear = false } = Astro.props;
                 {it.client}
                 {showYear && it.year && <span class="tabular ple__year"> · {it.year}</span>}
               </span>
+
+              <!-- Desktop: arrow on hover -->
               <span class="ple__arrow" aria-hidden="true">→</span>
-              <img class="ple__inline" src={it.cover} alt="" loading="lazy" />
+
+              <!-- Mobile: imagen inline + (+) -->
+              <span class="ple__thumb">
+                <img src={it.cover} alt="" loading="lazy" decoding="async" />
+                <span class="ple__plus" aria-hidden="true">(+)</span>
+              </span>
             </a>
           </li>
           <hr class="hr" />
@@ -54,35 +63,75 @@ const { items, startIndex = 0, showYear = false } = Astro.props;
 <style>
   .ple { position: relative; }
   .ple__items { list-style: none; padding: 0; margin: 0; }
-  .ple__item { /* sin border, lo da el .hr externo */ }
 
+  /* ============ MOBILE (default) ============ */
+  /* Row: texto izq + imagen derecha. */
   .ple__link {
     display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: var(--sp-3);
-    align-items: baseline;
-    padding: var(--sp-5) var(--gutter);
-    transition: padding var(--dur) var(--ease), color var(--dur) var(--ease);
+    grid-template-columns: 1fr clamp(110px, 32vw, 160px);
+    grid-template-rows: auto auto auto;
+    column-gap: var(--sp-4);
+    row-gap: var(--sp-1);
+    align-items: start;
+    padding: var(--sp-4) var(--gutter);
+    transition: padding-left var(--dur) var(--ease);
   }
-  /* Mobile layout: nombre grande arriba, debajo cats + client en línea */
-  .ple__num { grid-column: 1; grid-row: 1; align-self: start; padding-top: 4px; }
-  .ple__title { grid-column: 2 / 4; grid-row: 1; }
-  .ple__cats { grid-column: 2 / 4; grid-row: 2; }
-  .ple__client { grid-column: 2 / 4; grid-row: 3; }
+  .ple__num { grid-column: 1; grid-row: 1; padding-bottom: 4px; }
+  .ple__title { grid-column: 1; grid-row: 2; }
+  .ple__cats { grid-column: 1; grid-row: 3; padding-top: 4px; }
+  .ple__client { grid-column: 1; grid-row: 4; }
   .ple__arrow { display: none; }
-  .ple__inline { display: none; }
 
+  .ple__thumb {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    position: relative;
+    align-self: stretch;
+    overflow: hidden;
+    background: var(--subtle);
+    aspect-ratio: 1 / 1;
+  }
+  .ple__thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .ple__plus {
+    position: absolute;
+    top: 6px; right: 8px;
+    font-size: var(--fs-xs);
+    color: var(--c-blanco);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.35);
+    letter-spacing: 0.04em;
+  }
+
+  /* Tipografía mobile */
+  .ple__title {
+    font-size: clamp(1.5rem, 6vw, 2.25rem);
+    font-weight: 300;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+  }
+  .ple__cats { font-size: var(--fs-sm); color: var(--muted); line-height: 1.4; }
+  .ple__client { font-size: var(--fs-sm); color: var(--muted); }
+  .ple__year { color: var(--muted); }
+
+  .ple__link:hover .ple__title { opacity: 0.7; }
+
+  /* ============ DESKTOP (>=900px) ============ */
   @media (min-width: 900px) {
     .ple__link {
       grid-template-columns: 50px minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) auto;
-      gap: var(--sp-6);
+      grid-template-rows: auto;
+      column-gap: var(--sp-6);
       padding: var(--sp-4) var(--gutter);
       align-items: center;
     }
-    .ple__num { grid-column: 1; grid-row: 1; align-self: center; padding-top: 0; }
-    .ple__title { grid-column: 2; grid-row: 1; }
-    .ple__cats { grid-column: 3; grid-row: 1; }
-    .ple__client { grid-column: 4; grid-row: 1; text-align: right; }
+    .ple__num { grid-column: 1; grid-row: 1; padding-bottom: 0; }
+    .ple__title { grid-column: 2; grid-row: 1; font-size: clamp(1.75rem, 3.5vw, 2.75rem); }
+    .ple__cats { grid-column: 3; grid-row: 1; padding-top: 0; }
+    .ple__client { grid-column: 4; grid-row: 1; text-align: right; color: var(--fg); }
+    .ple__thumb { display: none; }
     .ple__arrow {
       display: inline-block;
       grid-column: 5; grid-row: 1;
@@ -92,46 +141,12 @@ const { items, startIndex = 0, showYear = false } = Astro.props;
       opacity: 0;
       transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
     }
+    .ple__link:hover { padding-left: calc(var(--gutter) + var(--sp-3)); }
+    .ple__link:hover .ple__title { opacity: 1; }
+    .ple__link:hover .ple__arrow { opacity: 1; transform: translateX(0); }
   }
 
-  .ple__link:hover {
-    padding-left: calc(var(--gutter) + var(--sp-3));
-  }
-  .ple__link:hover .ple__title { color: var(--accent); }
-  .ple__link:hover .ple__arrow {
-    opacity: 1;
-    transform: translateX(0);
-    color: var(--accent);
-  }
-
-  /* Tipografía */
-  .ple__title {
-    font-size: clamp(1.625rem, 4.5vw, 2.75rem);
-    font-weight: 300;
-    letter-spacing: -0.025em;
-    line-height: 1.05;
-  }
-  .ple__cats {
-    font-size: var(--fs-sm);
-    color: var(--muted);
-    line-height: 1.4;
-  }
-  .ple__client {
-    font-size: var(--fs-sm);
-    color: var(--fg);
-    font-weight: 400;
-  }
-  .ple__year { color: var(--muted); }
-
-  /* Mobile: nombre del proyecto sigue siendo grande, jerarquía no se rompe */
-  @media (max-width: 899px) {
-    .ple__link { padding-block: var(--sp-5) var(--sp-5); }
-    .ple__title { font-size: clamp(1.75rem, 7vw, 2.5rem); margin-bottom: var(--sp-2); }
-    .ple__cats { margin-bottom: 4px; }
-    .ple__client { color: var(--muted); }
-  }
-
-  /* Image follower (desktop only) */
+  /* ============ Image follower (desktop only) ============ */
   .ple__follower {
     position: fixed;
     top: 0; left: 0;
@@ -165,16 +180,15 @@ const { items, startIndex = 0, showYear = false } = Astro.props;
 
     const target = { x: window.innerWidth * 0.7, y: window.innerHeight * 0.5 };
     const pos = { x: target.x, y: target.y };
-    let raf = 0;
 
     const tick = () => {
       pos.x += (target.x - pos.x) * 0.16;
       pos.y += (target.y - pos.y) * 0.16;
       const scale = follower.classList.contains('is-on') ? 1 : 0.95;
       follower.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) scale(${scale})`;
-      raf = requestAnimationFrame(tick);
+      requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
+    requestAnimationFrame(tick);
 
     list.querySelectorAll<HTMLLIElement>('.ple__item').forEach((li) => {
       const cover = li.dataset.cover;

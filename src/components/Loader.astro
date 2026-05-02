@@ -1,0 +1,87 @@
+---
+// Intro loader minimal: contador 00→100 + sweep al body.
+// Solo dispara una vez por sesión (sessionStorage).
+---
+<div id="loader" aria-hidden="true">
+  <div class="loader__inner">
+    <span class="loader__count tabular" id="loader-count">00</span>
+    <span class="loader__sep">/</span>
+    <span class="loader__total tabular">100</span>
+  </div>
+  <div class="loader__sweep"></div>
+</div>
+
+<style>
+  #loader {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: var(--c-negro);
+    color: var(--c-blanco);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: var(--gutter);
+    pointer-events: none;
+  }
+  .loader__inner {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: clamp(2.5rem, 9vw, 6rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-weight: 300;
+    z-index: 1;
+  }
+  .loader__sep, .loader__total {
+    opacity: 0.35;
+    font-size: 0.42em;
+    transform: translateY(-1.6em);
+  }
+  .loader__sweep {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    transform: translateY(100%);
+    transition: transform 900ms var(--ease);
+    z-index: 0;
+  }
+  #loader.is-out .loader__sweep { transform: translateY(0); }
+  #loader.is-done { display: none; }
+
+  @media (prefers-reduced-motion: reduce) { #loader { display: none; } }
+</style>
+
+<script>
+  const init = () => {
+    const loader = document.getElementById('loader');
+    const counter = document.getElementById('loader-count');
+    if (!loader || !counter) return;
+
+    if (sessionStorage.getItem('sopa_v3_loaded') === '1') {
+      loader.classList.add('is-done');
+      document.body.classList.add('loader-done');
+      return;
+    }
+
+    let n = 0;
+    const tick = () => {
+      n += Math.max(1, Math.round((100 - n) * 0.06));
+      if (n >= 100) {
+        counter.textContent = '100';
+        setTimeout(() => loader.classList.add('is-out'), 250);
+        setTimeout(() => {
+          loader.classList.add('is-done');
+          document.body.classList.add('loader-done');
+          sessionStorage.setItem('sopa_v3_loaded', '1');
+        }, 1200);
+      } else {
+        counter.textContent = String(n).padStart(2, '0');
+        setTimeout(tick, 28 + Math.random() * 50);
+      }
+    };
+    tick();
+  };
+  init();
+</script>

@@ -13,7 +13,8 @@
   --c-verde: #71b790;
   --c-morado: #b4b5df;
 
-  --accent: var(--c-azul);
+  /* B/N puro: el "accent" es el mismo fg. Énfasis = bold o invertido. */
+  --accent: var(--fg);
 
   /* Light tokens */
   --bg: #f0f0f0;

@@ -2,6 +2,9 @@
 import Base from '../layouts/Base.astro';
 import ProjectListEditorial from '../components/ProjectListEditorial.astro';
 import Status from '../components/Status.astro';
+import Float from '../components/Float.astro';
+import Wink from '../components/Wink.astro';
+import Logo from '../components/Logo.astro';
 import { getCollection } from 'astro:content';
 import { team } from '../data/team';
 import { awards } from '../data/awards';
@@ -23,35 +26,45 @@ const featured = portfolio.slice(0, 5).map(p => ({
 ---
 
 <Base>
-  <!-- HERO MINIMAL -->
-  <section class="hero wrap">
-    <p class="eye hero__eye">Estudio creativo · Monterrey, MX · est. <span class="tabular">2017</span></p>
-
-    <h1 class="hero__title">
-      <span class="hero__line">Convertimos</span>
-      <span class="hero__line">ideas en buenas</span>
-      <span class="hero__line">ideas <span class="hero__wink" aria-hidden="true">;)</span></span>
-    </h1>
-
-    <div class="hero__bot">
-      <div class="hero__lede">
-        <p>
-          Acompañamos a marcas, instituciones y proyectos culturales con
-          <strong class="bold">estrategia creativa</strong>,
-          <strong class="bold">diseño</strong> y
-          <strong class="bold">producción audiovisual</strong>.
-          Desde Monterrey, para todos lados.
-        </p>
-      </div>
-      <Status />
+  <!-- HERO: lede + señor caminando + wordmark gigante abajo -->
+  <section class="hero" aria-label="Inicio">
+    <div class="hero__lede">
+      <p>
+        Desarrollamos proyectos empresariales y de impacto cultural
+        a través de estrategia creativa, diseño y producción audiovisual.
+      </p>
     </div>
+
+    <div class="hero__figure">
+      <img
+        src="/images/decor/senor-byn.png"
+        alt=""
+        class="hero__senor"
+        loading="eager"
+        decoding="async"
+        draggable="false"
+      />
+      <p class="hero__tag">
+        <span class="hero__tag-line">buenas</span>
+        <span class="hero__tag-line hero__tag-line--alt">ideas <Wink /></span>
+      </p>
+    </div>
+
+    <div class="hero__wordmark" aria-hidden="true">
+      <Logo class="hero__logo" />
+    </div>
+  </section>
+
+  <!-- STATUS bar -->
+  <section class="status-bar wrap">
+    <Status />
   </section>
 
   <hr class="hr" />
 
   <!-- TRABAJO seleccionado -->
-  <section id="trabajo">
-    <header class="sec wrap">
+  <section id="trabajo" class="sec sec--np">
+    <header class="sec__head wrap">
       <p class="eye">Trabajo<span class="tabular">({portfolio.length})</span></p>
       <h2 class="sec__title">
         <span class="bold">Recientes</span>
@@ -71,17 +84,18 @@ const featured = portfolio.slice(0, 5).map(p => ({
 
   <hr class="hr" />
 
-  <!-- NOSOTROS -->
-  <section id="nosotros" class="wrap sec sec--np">
-    <header class="sec__head">
+  <!-- NOSOTROS con float lápiz -->
+  <section id="nosotros" class="wrap sec sec--np sec--rel">
+    <Float src="/images/decor/pencil.png" alt="" label="nosotros" top="6%" left="4%" size="clamp(70px, 10vw, 130px)" rotate="-12deg" />
+
+    <header class="sec__head sec__head--right">
       <p class="eye">Nosotros</p>
     </header>
 
     <p class="manifesto" data-reveal>
-      Hacemos cosas que <span class="bold">se ven serias</span> porque
-      nos las tomamos en serio. Pero por dentro somos
-      <span class="manifesto__alt">cero serios</span><span class="hero__wink">;)</span>
-      Ese es el encanto sopa.
+      Hacemos cosas que <span class="bold">se ven serias</span> porque nos las
+      tomamos en serio. Pero por dentro somos <span class="bold">cero serios</span>
+      <Wink />. Ese es el encanto sopa.
     </p>
 
     <div class="cols-2" data-reveal style="--reveal-delay: 200ms">
@@ -105,7 +119,9 @@ const featured = portfolio.slice(0, 5).map(p => ({
   <hr class="hr" />
 
   <!-- EQUIPO -->
-  <section id="equipo" class="wrap sec sec--np">
+  <section id="equipo" class="wrap sec sec--np sec--rel">
+    <Float src="/images/decor/smiley.png" alt="" top="8%" right="6%" size="clamp(50px, 7vw, 90px)" rotate="14deg" />
+
     <header class="sec__head">
       <p class="eye">Equipo<span class="tabular">({team.length})</span></p>
     </header>
@@ -129,7 +145,9 @@ const featured = portfolio.slice(0, 5).map(p => ({
   <hr class="hr" />
 
   <!-- PREMIOS -->
-  <section id="premios" class="sec sec--np">
+  <section id="premios" class="sec sec--np sec--rel">
+    <Float src="/images/decor/shamrock.png" alt="" bottom="8%" left="3%" size="clamp(50px, 7vw, 100px)" rotate="-8deg" />
+
     <header class="wrap sec__head">
       <p class="eye">Reconocimientos<span class="tabular">({awards.length})</span></p>
     </header>
@@ -137,12 +155,12 @@ const featured = portfolio.slice(0, 5).map(p => ({
     <ul class="awards">
       {awards.map(a => (
         <li class="award" data-reveal>
-          <a class="award__row wrap" href="#" tabindex="-1">
+          <div class="award__row wrap">
             <span class="award__year tabular">{a.year}</span>
             <span class="award__name"><span class="bold">{a.award}</span>{a.level && <span class="award__level"> · {a.level}</span>}</span>
             <span class="award__project">{a.project}</span>
             <span class="award__cat">{a.category}</span>
-          </a>
+          </div>
           <hr class="hr" />
         </li>
       ))}
@@ -151,44 +169,124 @@ const featured = portfolio.slice(0, 5).map(p => ({
 </Base>
 
 <style>
-  /* HERO */
+  /* ========= HERO ========= */
   .hero {
-    padding-block: clamp(4rem, 10vw, 8rem) clamp(3rem, 7vw, 6rem);
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-8);
-  }
-  .hero__eye { margin-bottom: var(--sp-4); }
-  .hero__title {
-    font-size: var(--fs-display);
-    line-height: 0.95;
-    letter-spacing: -0.04em;
-    font-weight: 300;
-  }
-  .hero__line { display: block; }
-  .hero__wink { color: var(--accent); display: inline-block; margin-left: 0.04em; }
-
-  .hero__bot {
+    position: relative;
+    min-height: calc(100dvh - 64px);
     display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--sp-5);
-    margin-top: var(--sp-4);
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr auto;
+    column-gap: var(--sp-6);
+    padding: clamp(2rem, 6vh, 5rem) var(--gutter) 0;
+    overflow: hidden;
   }
-  @media (min-width: 900px) {
-    .hero__bot { grid-template-columns: 1.4fr 1fr; align-items: end; gap: var(--sp-10); }
+
+  .hero__lede {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+    padding-bottom: var(--sp-8);
+    max-width: 28ch;
   }
   .hero__lede p {
-    max-width: 50ch;
-    font-size: var(--fs-md);
-    line-height: 1.55;
-    color: var(--muted);
+    font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+    line-height: 1.35;
+    font-weight: 300;
+    color: var(--fg);
   }
-  .hero__lede strong { color: var(--fg); font-weight: 700; }
 
-  /* Section base */
+  .hero__figure {
+    grid-column: 2;
+    grid-row: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: clamp(1rem, 6vw, 6rem);
+  }
+  .hero__senor {
+    height: clamp(280px, 45vh, 480px);
+    width: auto;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }
+  .hero__tag {
+    position: absolute;
+    bottom: clamp(2rem, 8vh, 6rem);
+    right: clamp(2rem, 12vw, 10rem);
+    font-size: clamp(1.5rem, 2.6vw, 2.5rem);
+    line-height: 1.05;
+    font-weight: 300;
+    text-align: left;
+    pointer-events: none;
+  }
+  .hero__tag-line { display: block; }
+  .hero__tag-line--alt { padding-left: 1.4em; }
+
+  /* WORDMARK GIGANTE — pisado al bottom, full-width */
+  .hero__wordmark {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    line-height: 0.85;
+    margin-top: var(--sp-4);
+    padding-bottom: clamp(0.5rem, 2vh, 1.5rem);
+  }
+  :global(.hero__logo) {
+    display: block;
+    width: 100%;
+    height: auto;
+    color: var(--fg);
+  }
+
+  /* MOBILE: stack vertical, figura + tag, lede, wordmark abajo */
+  @media (max-width: 720px) {
+    .hero {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto;
+      min-height: auto;
+      padding-top: var(--sp-6);
+    }
+    .hero__figure {
+      grid-column: 1;
+      grid-row: 1;
+      padding-right: 0;
+      justify-content: center;
+      padding-block: var(--sp-6);
+    }
+    .hero__senor { height: clamp(220px, 38vh, 320px); }
+    .hero__tag {
+      bottom: var(--sp-4);
+      right: 50%;
+      transform: translateX(80px);
+    }
+    .hero__lede {
+      grid-column: 1;
+      grid-row: 2;
+      padding: var(--sp-4) 0 var(--sp-8);
+      max-width: none;
+      align-self: start;
+    }
+    .hero__wordmark {
+      grid-column: 1;
+      grid-row: 3;
+      padding-bottom: var(--sp-3);
+    }
+  }
+
+  /* ========= STATUS BAR ========= */
+  .status-bar {
+    padding-block: var(--sp-4) var(--sp-6);
+  }
+
+  /* ========= SECTIONS ========= */
   .sec { padding-block: clamp(3rem, 6vw, 5rem); }
   .sec--np { padding-block: clamp(3rem, 6vw, 5rem); }
+  .sec--rel { position: relative; }
   .sec__head { margin-bottom: var(--sp-6); display: flex; flex-direction: column; gap: var(--sp-2); }
+  .sec__head--right { align-items: flex-end; text-align: right; }
   .sec__title {
     font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 300;
@@ -209,13 +307,13 @@ const featured = portfolio.slice(0, 5).map(p => ({
     gap: var(--sp-2);
     font-size: var(--fs-md);
     color: var(--fg);
-    transition: color var(--dur);
+    transition: opacity var(--dur);
   }
   .more__arrow { transition: transform var(--dur) var(--ease); }
-  .more:hover { color: var(--accent); }
+  .more:hover { opacity: 0.6; }
   .more:hover .more__arrow { transform: translateX(4px); }
 
-  /* Manifesto */
+  /* ========= MANIFESTO ========= */
   .manifesto {
     font-size: clamp(1.5rem, 3vw, 2.25rem);
     line-height: 1.3;
@@ -226,7 +324,6 @@ const featured = portfolio.slice(0, 5).map(p => ({
     margin-bottom: var(--sp-10);
   }
   .manifesto .bold { font-weight: 700; }
-  .manifesto__alt { color: var(--accent); }
 
   .cols-2 {
     display: grid;
@@ -239,7 +336,7 @@ const featured = portfolio.slice(0, 5).map(p => ({
   .cols-2 .eye { margin-bottom: var(--sp-2); }
   .cols-2__p { font-size: var(--fs-md); line-height: 1.5; max-width: 38ch; color: var(--fg); }
 
-  /* Equipo */
+  /* ========= EQUIPO ========= */
   .team {
     display: grid;
     grid-template-columns: 1fr;
@@ -260,14 +357,14 @@ const featured = portfolio.slice(0, 5).map(p => ({
     margin: 0;
     font-size: var(--fs-md);
     color: var(--fg);
-    border-left: 1px solid var(--accent);
+    border-left: 1px solid var(--fg);
     padding-left: var(--sp-3);
     line-height: 1.45;
     max-width: 38ch;
   }
   .member__links { list-style: none; padding: 0; margin: 0; display: flex; gap: var(--sp-4); font-size: var(--fs-sm); }
 
-  /* Premios — toda la fila como una sola línea legible */
+  /* ========= PREMIOS ========= */
   .awards { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--hairline); }
   .award__row {
     display: grid;
@@ -275,12 +372,11 @@ const featured = portfolio.slice(0, 5).map(p => ({
     gap: var(--sp-3);
     padding-block: var(--sp-4);
     align-items: baseline;
-    pointer-events: none;
   }
   .award__year { grid-column: 1; grid-row: 1 / span 3; font-size: var(--fs-lg); }
   .award__name { grid-column: 2; grid-row: 1; font-size: var(--fs-md); }
   .award__name .bold { font-weight: 700; }
-  .award__level { color: var(--accent); }
+  .award__level { color: var(--muted); }
   .award__project, .award__cat { grid-column: 2; font-size: var(--fs-sm); color: var(--muted); }
   .award__project { grid-row: 2; }
   .award__cat { grid-row: 3; }

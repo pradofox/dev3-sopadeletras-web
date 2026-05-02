@@ -1,0 +1,98 @@
+---
+// Cosita decorativa flotando. Posicionable absolute con %, opcional label debajo.
+// Estética sopa: minimalismo + objetos sueltos como zine, micro-bob al hover.
+interface Props {
+  src: string;
+  alt?: string;
+  label?: string;
+  /** Top en %, ejemplo "12%" */
+  top?: string;
+  /** Left en %, ejemplo "8%" */
+  left?: string;
+  /** Right en % alternativo a left */
+  right?: string;
+  /** Bottom alternativo a top */
+  bottom?: string;
+  /** Tamaño máximo en px o clamp */
+  size?: string;
+  /** Rotación inicial */
+  rotate?: string;
+  /** Eager para floats above-the-fold del hero */
+  eager?: boolean;
+}
+const {
+  src, alt = '', label,
+  top, left, right, bottom,
+  size = 'clamp(60px, 8vw, 120px)',
+  rotate = '0deg',
+  eager = false,
+} = Astro.props;
+
+const styleVars = [
+  top && `--ft:${top}`,
+  left && `--fl:${left}`,
+  right && `--fr:${right}`,
+  bottom && `--fb:${bottom}`,
+  `--fs:${size}`,
+  `--fr-rot:${rotate}`,
+].filter(Boolean).join(';');
+---
+
+<figure class="fl" style={styleVars} data-float>
+  <img
+    src={src}
+    alt={alt}
+    loading={eager ? 'eager' : 'lazy'}
+    decoding="async"
+    draggable="false"
+  />
+  {label && <figcaption>{label}</figcaption>}
+</figure>
+
+<style>
+  .fl {
+    position: absolute;
+    top: var(--ft, auto);
+    left: var(--fl, auto);
+    right: var(--fr, auto);
+    bottom: var(--fb, auto);
+    width: var(--fs, 90px);
+    margin: 0;
+    pointer-events: none;
+    z-index: 1;
+    transform: rotate(var(--fr-rot, 0deg));
+    transition: transform 600ms var(--ease);
+    user-select: none;
+  }
+  .fl img {
+    width: 100%;
+    height: auto;
+    display: block;
+    pointer-events: auto;
+    transition: transform 600ms var(--ease);
+  }
+  .fl:hover img {
+    transform: translateY(-6px) rotate(-3deg);
+  }
+  .fl figcaption {
+    text-align: center;
+    font-size: var(--fs-sm);
+    color: var(--muted);
+    margin-top: 6px;
+    white-space: nowrap;
+  }
+
+  /* Float sutil cíclico (opcional via .fl--bob) */
+  .fl--bob img { animation: fl-bob 6s var(--ease) infinite; }
+  @keyframes fl-bob {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-8px) rotate(-2deg); }
+  }
+
+  @media (max-width: 640px) {
+    .fl { width: calc(var(--fs, 90px) * 0.65); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fl, .fl img, .fl--bob img { animation: none; transition: none; }
+  }
+</style>
