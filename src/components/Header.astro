@@ -48,52 +48,60 @@ const links = [
 </header>
 
 <style>
+  /* Header con mix-blend-mode: difference para que logo + items se inviertan
+   * automático según el fondo. Sobre claro = se ve negro, sobre oscuro = se
+   * ve blanco. Sin JS de detección de fondo.
+   */
   .hdr {
-    position: sticky;
-    top: 0;
+    position: fixed;
+    top: 0; left: 0; right: 0;
     z-index: 50;
-    background: var(--bg);
+    pointer-events: none;
+    mix-blend-mode: difference;
+    color: #fff;
   }
   .hdr__row {
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
-    gap: var(--sp-4);
+    gap: var(--sp-3);
     padding: var(--sp-4) var(--gutter) var(--sp-3);
   }
+  .hdr__brand, .hdr__nav, .hdr__menu { pointer-events: auto; }
+
   .hdr__brand { display: inline-flex; align-items: center; }
   :global(.hdr__logo) {
     display: block;
-    height: 16px;
+    height: 18px;
     width: auto;
-    color: var(--fg);
+    color: #fff;
   }
-  @media (min-width: 768px) { :global(.hdr__logo) { height: 20px; } }
+  @media (min-width: 768px) { :global(.hdr__logo) { height: 22px; } }
 
   .hdr__nav {
     display: none;
-    gap: var(--sp-5);
+    gap: var(--sp-2);
     justify-self: end;
-    align-items: baseline;
+    align-items: center;
   }
   .hdr__link {
+    /* Items con bg translúcido. Al verse a través de difference, el fondo
+       gris del bg se ve como un pillbox sutil sobre cualquier color. */
+    background: rgba(255, 255, 255, 0.55);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 0;
     font-size: var(--fs-md);
-    color: var(--fg);
-    position: relative;
-    padding: 4px 0;
-    transition: opacity var(--dur) var(--ease);
+    transition: background var(--dur) var(--ease);
+    line-height: 1.2;
   }
-  .hdr__link:hover { opacity: 0.55; }
-  .hdr__link.is-on::after {
-    content: '';
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    height: 1px; background: currentColor;
-  }
+  .hdr__link:hover { background: rgba(255, 255, 255, 0.85); }
+  .hdr__link.is-on { background: rgba(255, 255, 255, 0.95); }
 
   .hdr__menu {
     font-size: var(--fs-md);
     padding: var(--sp-2) 0;
+    color: #fff;
   }
 
   @media (min-width: 768px) {
@@ -101,13 +109,23 @@ const links = [
     .hdr__menu { display: none; }
   }
 
+  /* Spacer global: que main no quede tapado por el header fixed */
+  :global(main) { padding-top: 56px; }
+  @media (min-width: 768px) { :global(main) { padding-top: 64px; } }
+
   .hdr__sheet {
     background: var(--bg);
+    color: var(--fg);
     padding: var(--sp-4) var(--gutter) var(--sp-6);
     display: flex;
     flex-direction: column;
     gap: var(--sp-4);
     border-top: 1px solid var(--hairline);
+    pointer-events: auto;
+    mix-blend-mode: normal;
+    position: fixed;
+    inset: 56px 0 0 0;
+    z-index: 40;
   }
   .hdr__sheet[hidden] { display: none; }
   .hdr__sheet ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--sp-2); }
@@ -126,10 +144,12 @@ const links = [
       btn.setAttribute('aria-expanded', String(!open));
       if (open) sheet.setAttribute('hidden', '');
       else sheet.removeAttribute('hidden');
+      document.body.style.overflow = open ? '' : 'hidden';
     });
     sheet.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
       btn.setAttribute('aria-expanded', 'false');
       sheet.setAttribute('hidden', '');
+      document.body.style.overflow = '';
     }));
   };
   document.addEventListener('astro:page-load', initMenu);

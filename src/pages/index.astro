@@ -5,6 +5,7 @@ import Status from '../components/Status.astro';
 import Float from '../components/Float.astro';
 import Wink from '../components/Wink.astro';
 import Logo from '../components/Logo.astro';
+import Loader from '../components/Loader.astro';
 import { getCollection } from 'astro:content';
 import { team } from '../data/team';
 import { awards } from '../data/awards';
@@ -26,7 +27,9 @@ const featured = portfolio.slice(0, 5).map(p => ({
 ---
 
 <Base>
-  <!-- HERO: lede + señor caminando + wordmark gigante abajo -->
+  <Loader />
+
+  <!-- HERO con escaleras: el señor pisa las palabras "buenas" e "ideas ;)" -->
   <section class="hero" aria-label="Inicio">
     <div class="hero__lede">
       <p>
@@ -35,7 +38,7 @@ const featured = portfolio.slice(0, 5).map(p => ({
       </p>
     </div>
 
-    <div class="hero__figure">
+    <div class="hero__stage">
       <img
         src="/images/decor/senor-byn.png"
         alt=""
@@ -44,10 +47,8 @@ const featured = portfolio.slice(0, 5).map(p => ({
         decoding="async"
         draggable="false"
       />
-      <p class="hero__tag">
-        <span class="hero__tag-line">buenas</span>
-        <span class="hero__tag-line hero__tag-line--alt">ideas <Wink /></span>
-      </p>
+      <span class="hero__step hero__step--top">ideas <Wink /></span>
+      <span class="hero__step hero__step--bot">buenas</span>
     </div>
 
     <div class="hero__wordmark" aria-hidden="true">
@@ -84,36 +85,26 @@ const featured = portfolio.slice(0, 5).map(p => ({
 
   <hr class="hr" />
 
-  <!-- NOSOTROS con float lápiz -->
-  <section id="nosotros" class="wrap sec sec--np sec--rel">
-    <Float src="/images/decor/pencil.png" alt="" label="nosotros" top="6%" left="4%" size="clamp(70px, 10vw, 130px)" rotate="-12deg" />
+  <!-- NOSOTROS al estilo del actual: eyebrow + lápiz pequeño + texto central -->
+  <section id="nosotros" class="nosotros sec--rel wrap">
+    <p class="eye nosotros__eye">Nosotros</p>
 
-    <header class="sec__head sec__head--right">
-      <p class="eye">Nosotros</p>
-    </header>
+    <Float
+      src="/images/decor/pencil.png"
+      alt=""
+      top="34%"
+      left="10%"
+      size="clamp(60px, 7vw, 100px)"
+      rotate="-58deg"
+    />
 
-    <p class="manifesto" data-reveal>
-      Hacemos cosas que <span class="bold">se ven serias</span> porque nos las
-      tomamos en serio. Pero por dentro somos <span class="bold">cero serios</span>
-      <Wink />. Ese es el encanto sopa.
+    <p class="nosotros__text" data-reveal>
+      Acompañamos a marcas y emprendedores a dar
+      <span class="bold">estructura</span>,
+      <span class="bold">claridad</span> y
+      <span class="bold">dirección</span> a sus ideas, desde el enfoque
+      hasta la ejecución. Convertimos ideas en buenas ideas <Wink />.
     </p>
-
-    <div class="cols-2" data-reveal style="--reveal-delay: 200ms">
-      <div>
-        <p class="eye">Estudio pequeño, ágil</p>
-        <p class="cols-2__p">
-          Cuando contratas a sopadeletras® no te toca un junior. Te toca el equipo entero,
-          de principio a fin. Trabajamos con cuidado, sin perder velocidad.
-        </p>
-      </div>
-      <div>
-        <p class="eye">Multidisciplinario</p>
-        <p class="cols-2__p">
-          Estrategia, branding, diseño, foto y video, web, editorial.
-          Hacemos lo que el proyecto necesita, no lo que nos toque ofrecer.
-        </p>
-      </div>
-    </div>
   </section>
 
   <hr class="hr" />
@@ -169,70 +160,81 @@ const featured = portfolio.slice(0, 5).map(p => ({
 </Base>
 
 <style>
-  /* ========= HERO ========= */
+  /* ========= HERO ESCALERAS =========
+   * Layout: lede top-left + stage central con figura+palabras + wordmark gigante abajo.
+   * El señor camina entre "buenas" (abajo-izq) e "ideas ;)" (arriba-der), formando
+   * un staircase diagonal de palabras-escalón.
+   */
   .hero {
     position: relative;
     min-height: calc(100dvh - 64px);
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     grid-template-rows: 1fr auto;
-    column-gap: var(--sp-6);
-    padding: clamp(2rem, 6vh, 5rem) var(--gutter) 0;
+    padding: clamp(1rem, 4vh, 3rem) var(--gutter) 0;
     overflow: hidden;
   }
 
   .hero__lede {
-    grid-column: 1;
-    grid-row: 1;
-    align-self: end;
-    padding-bottom: var(--sp-8);
+    position: absolute;
+    top: clamp(5rem, 14vh, 9rem);
+    left: var(--gutter);
+    z-index: 2;
     max-width: 28ch;
   }
   .hero__lede p {
-    font-size: clamp(1.125rem, 1.6vw, 1.5rem);
-    line-height: 1.35;
+    font-size: clamp(1.0625rem, 1.4vw, 1.375rem);
+    line-height: 1.4;
     font-weight: 300;
     color: var(--fg);
   }
 
-  .hero__figure {
-    grid-column: 2;
-    grid-row: 1;
+  .hero__stage {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding-right: clamp(1rem, 6vw, 6rem);
+    grid-row: 1;
+    align-self: stretch;
+    height: 100%;
+    min-height: clamp(360px, 60vh, 600px);
   }
+
   .hero__senor {
-    height: clamp(280px, 45vh, 480px);
+    position: absolute;
+    right: clamp(8%, 16vw, 22%);
+    bottom: 0;
+    height: clamp(280px, 56vh, 520px);
     width: auto;
     object-fit: contain;
     user-select: none;
     pointer-events: none;
-    -webkit-user-drag: none;
+    z-index: 1;
   }
-  .hero__tag {
-    position: absolute;
-    bottom: clamp(2rem, 8vh, 6rem);
-    right: clamp(2rem, 12vw, 10rem);
-    font-size: clamp(1.5rem, 2.6vw, 2.5rem);
-    line-height: 1.05;
-    font-weight: 300;
-    text-align: left;
-    pointer-events: none;
-  }
-  .hero__tag-line { display: block; }
-  .hero__tag-line--alt { padding-left: 1.4em; }
 
-  /* WORDMARK GIGANTE — pisado al bottom, full-width */
+  .hero__step {
+    position: absolute;
+    font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    z-index: 2;
+    white-space: nowrap;
+  }
+  /* "ideas ;)" arriba derecha — pegado a donde mira el señor */
+  .hero__step--top {
+    top: clamp(28%, 38vh, 42%);
+    right: clamp(6%, 10vw, 14%);
+  }
+  /* "buenas" abajo izquierda — un escalón abajo del pie inferior */
+  .hero__step--bot {
+    top: clamp(46%, 56vh, 60%);
+    right: clamp(20%, 26vw, 32%);
+  }
+
+  /* WORDMARK GIGANTE pisado al bottom */
   .hero__wordmark {
-    grid-column: 1 / -1;
     grid-row: 2;
     width: 100%;
     line-height: 0.85;
-    margin-top: var(--sp-4);
-    padding-bottom: clamp(0.5rem, 2vh, 1.5rem);
+    padding-bottom: clamp(0.5rem, 1.5vh, 1rem);
   }
   :global(.hero__logo) {
     display: block;
@@ -241,52 +243,42 @@ const featured = portfolio.slice(0, 5).map(p => ({
     color: var(--fg);
   }
 
-  /* MOBILE: stack vertical, figura + tag, lede, wordmark abajo */
+  /* MOBILE: stack más simple. Lede arriba, stage debajo, wordmark abajo. */
   @media (max-width: 720px) {
     .hero {
-      grid-template-columns: 1fr;
-      grid-template-rows: auto auto auto;
-      min-height: auto;
-      padding-top: var(--sp-6);
-    }
-    .hero__figure {
-      grid-column: 1;
-      grid-row: 1;
-      padding-right: 0;
-      justify-content: center;
-      padding-block: var(--sp-6);
-    }
-    .hero__senor { height: clamp(220px, 38vh, 320px); }
-    .hero__tag {
-      bottom: var(--sp-4);
-      right: 50%;
-      transform: translateX(80px);
+      padding-top: var(--sp-5);
+      grid-template-rows: auto 1fr auto;
     }
     .hero__lede {
-      grid-column: 1;
-      grid-row: 2;
-      padding: var(--sp-4) 0 var(--sp-8);
+      position: static;
+      grid-row: 1;
       max-width: none;
-      align-self: start;
+      padding-bottom: var(--sp-5);
     }
-    .hero__wordmark {
-      grid-column: 1;
-      grid-row: 3;
-      padding-bottom: var(--sp-3);
+    .hero__stage {
+      grid-row: 2;
+      min-height: clamp(320px, 50vh, 460px);
     }
+    .hero__senor {
+      right: 18%;
+      height: clamp(240px, 44vh, 360px);
+    }
+    .hero__step {
+      font-size: clamp(1.25rem, 6vw, 1.75rem);
+    }
+    .hero__step--top { top: 28%; right: 8%; }
+    .hero__step--bot { top: 56%; right: 30%; }
+    .hero__wordmark { grid-row: 3; padding-bottom: var(--sp-3); }
   }
 
   /* ========= STATUS BAR ========= */
-  .status-bar {
-    padding-block: var(--sp-4) var(--sp-6);
-  }
+  .status-bar { padding-block: var(--sp-4) var(--sp-6); }
 
   /* ========= SECTIONS ========= */
   .sec { padding-block: clamp(3rem, 6vw, 5rem); }
   .sec--np { padding-block: clamp(3rem, 6vw, 5rem); }
   .sec--rel { position: relative; }
   .sec__head { margin-bottom: var(--sp-6); display: flex; flex-direction: column; gap: var(--sp-2); }
-  .sec__head--right { align-items: flex-end; text-align: right; }
   .sec__title {
     font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 300;
@@ -313,28 +305,38 @@ const featured = portfolio.slice(0, 5).map(p => ({
   .more:hover { opacity: 0.6; }
   .more:hover .more__arrow { transform: translateX(4px); }
 
-  /* ========= MANIFESTO ========= */
-  .manifesto {
-    font-size: clamp(1.5rem, 3vw, 2.25rem);
-    line-height: 1.3;
+  /* ========= NOSOTROS (estilo del sitio actual) =========
+   * Eyebrow chiquito arriba izq + lápiz pequeño en zona media + texto
+   * grande centrado en columna derecha. Mucho whitespace.
+   */
+  .nosotros {
+    padding-block: clamp(5rem, 12vw, 9rem);
+    min-height: clamp(380px, 60vh, 560px);
+    display: grid;
+    grid-template-columns: minmax(120px, 1fr) minmax(0, 3fr);
+    column-gap: clamp(1rem, 5vw, 4rem);
+    align-items: start;
+  }
+  .nosotros__eye { grid-column: 1; grid-row: 1; }
+  .nosotros__text {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: clamp(1.5rem, 2.8vw, 2.4rem);
+    line-height: 1.25;
     letter-spacing: -0.02em;
     font-weight: 300;
-    color: var(--fg);
-    max-width: 32ch;
-    margin-bottom: var(--sp-10);
+    max-width: 22ch;
   }
-  .manifesto .bold { font-weight: 700; }
+  .nosotros__text .bold { font-weight: 700; }
 
-  .cols-2 {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--sp-6);
-    border-top: 1px solid var(--hairline);
-    padding-top: var(--sp-5);
+  @media (max-width: 720px) {
+    .nosotros {
+      grid-template-columns: 1fr;
+      gap: var(--sp-6);
+    }
+    .nosotros__eye, .nosotros__text { grid-column: 1; }
+    .nosotros__text { grid-row: 2; }
   }
-  @media (min-width: 720px) { .cols-2 { grid-template-columns: 1fr 1fr; gap: var(--sp-10); } }
-  .cols-2 .eye { margin-bottom: var(--sp-2); }
-  .cols-2__p { font-size: var(--fs-md); line-height: 1.5; max-width: 38ch; color: var(--fg); }
 
   /* ========= EQUIPO ========= */
   .team {

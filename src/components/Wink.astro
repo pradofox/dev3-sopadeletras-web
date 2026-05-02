@@ -1,53 +1,32 @@
 ---
-// Wink microinteracción: el ";)" parpadea a ":)" cada 4-6s.
-// Sutil pero notorio cuando lo agarras al ojo. Encanto sopa.
+// Wink microinteracción: el ";)" parpadea a ":)" cada 3-6s.
+// Implementación simple: JS swap del textContent.
 ---
-<span class="wink" data-wink aria-hidden="true">
-  <span class="wink__semi">;</span><span class="wink__paren">)</span>
-</span>
+<span class="wink" data-wink aria-hidden="true">;)</span>
 
 <style>
   .wink {
     display: inline-block;
     transform: translateY(-0.04em);
-    font-feature-settings: 'kern' on;
+    transition: opacity 80ms var(--ease);
   }
-  .wink__semi {
-    display: inline-block;
-    position: relative;
-    transition: opacity 140ms var(--ease);
-  }
-  .wink.is-blink .wink__semi {
-    opacity: 0;
-  }
-  .wink.is-blink .wink__semi::after {
-    content: ':';
-    position: absolute;
-    left: 0; top: 0;
-    opacity: 1;
-    color: currentColor;
-  }
-  /* Workaround: cuando is-blink, mostrar ':' en lugar de ';' */
-  .wink.is-blink .wink__semi {
-    color: transparent;
-    opacity: 1;
-  }
-  .wink.is-blink .wink__semi::after { color: currentColor; }
+  .wink.is-blink { opacity: 0.92; }
 </style>
 
 <script>
   const init = () => {
     document.querySelectorAll<HTMLElement>('[data-wink]').forEach((el) => {
-      // Cada wink parpadea con un delay random para que no se sincronicen.
-      const baseDelay = 3000 + Math.random() * 3000;
-      let timer: ReturnType<typeof setInterval>;
-      const blink = () => {
+      // Cada wink con su propio delay random para que no se sincronicen
+      const cycle = 3200 + Math.random() * 3000;
+      const tick = () => {
         el.classList.add('is-blink');
-        setTimeout(() => el.classList.remove('is-blink'), 200);
+        // primero a un punto (de transición), luego a :), luego vuelve a ;)
+        setTimeout(() => { el.textContent = ':)'; }, 50);
+        setTimeout(() => { el.textContent = ';)'; el.classList.remove('is-blink'); }, 220);
       };
-      timer = setInterval(blink, baseDelay + Math.random() * 2000);
-      // Limpiar al cambio de página
-      document.addEventListener('astro:before-swap', () => clearInterval(timer), { once: true });
+      const handle = setInterval(tick, cycle);
+      // limpiar al cambio de página (View Transitions)
+      document.addEventListener('astro:before-swap', () => clearInterval(handle), { once: true });
     });
   };
   document.addEventListener('astro:page-load', init);
